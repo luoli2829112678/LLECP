@@ -16,6 +16,8 @@ void MC_Stop::operator()(CIA402Axis* axis,bool bExecute,double dDeceleration,dou
 {
     m_pCIA402Axis                                   = axis;
     m_bExecute                                      = bExecute;
+    m_MotionUint_New.PlanningMotionParam.pos            = axis->dActPosition;
+    m_MotionUint_New.PlanningMotionParam.vel            = axis->dSetVelocity_s;//此处使用命令速度，待优化
     m_MotionUint_New.PlanningMotionParam.dec            = dDeceleration;
     m_MotionUint_New.PlanningMotionParam.jerk           = dJerk;
     m_MotionUint_New.PlanningMotionParam.PlanningMode   = enStopPlanningMode;

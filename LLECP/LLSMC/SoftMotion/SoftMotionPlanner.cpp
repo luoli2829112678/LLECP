@@ -52,13 +52,15 @@ int SoftMotion::AxisMotionPlanner(CIA402Axis* pAxis)
                                 pAxis->m_stSoftMotionEX.dMotionTime,m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData);
             break;
         case EN_PlanningMode::enStopPlanningMode:
-                stopmotion(pAxis->dActPosition,pAxis->dActVelocity,pAxis->dActAcceleration,stMotionParam.dec,stMotionParam.jerk,pAxis->m_stSoftMotionEX.dMotionTime,T,m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData);
-                break;
+                stopmotion(stMotionParam.pos,stMotionParam.vel,pAxis->dSetAcceleration_s,stMotionParam.dec,stMotionParam.jerk,pAxis->m_stSoftMotionEX.dMotionTime,T,m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData);
+                printf("T:%F------Time:%f--------AxisPos:%f---vel:%f\n",T,pAxis->m_stSoftMotionEX.dMotionTime,m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData.P,
+                   m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData.V);
+                break;     
         default:
             break;
         }
         //开始运动 
-        pAxis->Axis_SetTargetPosition(m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData.P);
+        pAxis->Axis_SetMotionPlanner(m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData);
         //时间帧加
         pAxis->m_stSoftMotionEX.dMotionTime += m_dSoftMotionCycle;
     }
@@ -80,7 +82,7 @@ int SoftMotion::AxisMotionPlanner(CIA402Axis* pAxis)
             pAxis->m_stSoftMotionEX.dMotionTime = 0;
             stsetParam.q0 = pAxis->dActPosition;
             stsetParam.q1 = stMotionParam_Run.pos;
-            stsetParam.v0 = pAxis->dActVelocity;
+            stsetParam.v0 = pAxis->dSetVelocity_s;
             stsetParam.v1 = 0;
             stsetParam.a0 = 0;
             stsetParam.a1 = 0;
@@ -96,22 +98,26 @@ int SoftMotion::AxisMotionPlanner(CIA402Axis* pAxis)
                             pAxis->m_stSoftMotionEX.dMotionTime,m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData);
             break;
         case EN_PlanningMode::enStopPlanningMode:
+            stMotionParam.pos = pAxis->dActPosition;
+            stMotionParam.vel = pAxis->dSetVelocity_s;
             pAxis->m_stSoftMotionEX.stSoftMotionMotionParam = stMotionParam;
             pAxis->m_stSoftMotionEX.dMotionTime = 0;
+            printf("startStoppos:%f\n",pAxis->dActPosition);
             stopmotion(pAxis->dActPosition,
-                pAxis->dActVelocity,
-                pAxis->dActAcceleration,
+                pAxis->dSetVelocity_s,
+                pAxis->dSetAcceleration_s,
                 stMotionParam.dec,
                 stMotionParam.jerk,
                 pAxis->m_stSoftMotionEX.dMotionTime,
                 T,
                 m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData);
+                m_vSoftMotionPlanParams[pAxis->nAxisID].stActParam,m_vSoftMotionPlanParams[pAxis->nAxisID].trackData.T = T;
             break;
         default:
             break;
         }
         //开始运动 
-        pAxis->Axis_SetTargetPosition(m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData.P);
+        pAxis->Axis_SetMotionPlanner(m_vSoftMotionPlanParams[pAxis->nAxisID].stInterData);
         //时间帧加
         pAxis->m_stSoftMotionEX.dMotionTime += m_dSoftMotionCycle;
     }

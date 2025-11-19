@@ -206,15 +206,6 @@ int EtherCATMaster::InitRT_Thread()
         ecx_send_processdata(&m_ctx);
         m_nWkc = ecx_receive_processdata(&m_ctx,EC_TIMEOUTRET);
         ecx_statecheck(&m_ctx,0, EC_STATE_OPERATIONAL, 50000);
-        // uint32 Isize, Osize;
-        // ecx_readPDOmap(&m_ctx,1, &Osize, &Isize);
-         // writeSDO_INT(1, 0x1c12, 0x00, 0x00);
-         // writeSDO_INT(1, 0x1c12, 0x01, 0x1600);
-         // writeSDO_INT(1, 0x1c12, 0x00, 0x01);
-
-         // writeSDO_INT(1, 0x1c13, 0x00, 0x00);
-         // writeSDO_INT(1, 0x1c13, 0x01, 0x1a00);
-         // writeSDO_INT(1, 0x1c13, 0x00, 0x01);
          ecx_readstate(&m_ctx);
          for (cnt = 1; cnt <= m_ctx.slavecount; cnt++)
          {

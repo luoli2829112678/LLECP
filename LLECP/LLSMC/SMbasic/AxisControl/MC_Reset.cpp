@@ -58,6 +58,7 @@ void MC_Reset::Execute()
        m_fsReset = ReadyReset;
        return;
     }
+    //printf("m_fsReset:%d\n",m_fsReset);
     switch (m_fsReset)
     {
     case ReadyReset:
@@ -90,6 +91,7 @@ void MC_Reset::Execute()
         }
         m_bBusy = true;
         nControlWord = en_ControlWord_fr;
+        m_Timer.Ton(false, SMC_TIME_OUT);
         m_pCIA402Axis->Axis_PDO_SetControlword(nControlWord);
         m_fsReset = Reseting;
         break;
@@ -99,12 +101,13 @@ void MC_Reset::Execute()
             m_bError = true;
             m_nErrorID = SMEC_TIMEOUT;
             m_pCIA402Axis->Axis_SetAxisState(EN_AxisMotionState::motionState_errorstop);
+            m_pCIA402Axis->Axis_CheckError();
             m_fsReset = ResetError;
             break;
         }
         if(!m_pCIA402Axis->Axis_CheckError())
         {
-             m_pCIA402Axis->Axis_ResetError();
+            m_pCIA402Axis->Axis_ResetError();
             m_bDone = true;
             m_fsReset = ResetFinish;
             m_pCIA402Axis->Axis_SetAxisState(EN_AxisMotionState::motionState_power_off);

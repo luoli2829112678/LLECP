@@ -46,6 +46,7 @@ void MC_PowerOn::Execute()
     }
     uint16_t nControlWord = 0;
     uint16_t nStatusWord = 0;
+    int32_t nActPos;
     m_pCIA402Axis->Axis_PDO_ReadStatusWord(nStatusWord);
     m_pCIA402Axis->Axis_PDO_ReadControlword(nControlWord);
     m_bBusy = false;
@@ -71,7 +72,6 @@ void MC_PowerOn::Execute()
     //位置对齐
     if(ReadyPowerOn != m_fsPowerOn)
     {
-        int32_t nActPos;
         m_pCIA402Axis->Axis_PDO_ReadActualPosition(nActPos);
         m_pCIA402Axis->Axis_PDO_SetTargetPosition(nActPos);
     }
@@ -81,6 +81,8 @@ void MC_PowerOn::Execute()
         case ReadyPowerOn:
             if(m_Timer.R_TRIG(m_bExecute))
             {
+                m_pCIA402Axis->Axis_PDO_ReadActualPosition(nActPos);
+                m_pCIA402Axis->Axis_PDO_SetTargetPosition(nActPos);
                 //检测轴是否为去使能状态（错误或运动等状态禁用）
                 if(motionState_power_off != m_pCIA402Axis->Axis_ReadAxisState())
                 {

@@ -16,10 +16,10 @@ void MC_MoveVelocity::operator()(CIA402Axis* axis,bool bExecute,double dVelocity
 {
     m_pCIA402Axis                                   = axis;
     m_bExecute                                      = bExecute;
-    m_MotionUint_New.PlanningMotionParam.vel            = dVelocity;
-    m_MotionUint_New.PlanningMotionParam.acc            = dAcceleration;
-    m_MotionUint_New.PlanningMotionParam.dec            = dDeceleration;
-    m_MotionUint_New.PlanningMotionParam.jerk           = dJerk;
+    m_MotionUint_New.PlanningMotionParam.vel            = abs(dVelocity) * enDirection;//方向校正
+    m_MotionUint_New.PlanningMotionParam.acc            = abs(dAcceleration);
+    m_MotionUint_New.PlanningMotionParam.dec            = abs(dDeceleration);
+    m_MotionUint_New.PlanningMotionParam.jerk           = abs(dJerk);
     m_MotionUint_New.PlanningMotionParam.Direction      = enDirection;
     m_MotionUint_New.PlanningMotionParam.PlanningMode   = enVelocityPlanningMode;
     m_MotionUint_New.MoveType                           = enMoveTypeNull;

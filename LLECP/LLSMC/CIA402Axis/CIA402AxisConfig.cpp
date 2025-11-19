@@ -28,10 +28,10 @@ int CIA402Axis::Axis_SetEncodeHomePos(int32_t EncodeHomePos)
     return AEC_SUCCESSED;
 }
 
-int CIA402Axis::Axis_SetCurrentScales(double CurrentScales)
+int CIA402Axis::Axis_SetTorqueScales(double TorqueScales)
 {
-    m_stAxisConfiguration.dCurrentScales = CurrentScales;
-    dCurrentScales = CurrentScales;
+    m_stAxisConfiguration.dTorqueScales = TorqueScales;
+    dTorqueScales = TorqueScales;
     return AEC_SUCCESSED;
 }
 int CIA402Axis::Axis_SetVelocityScale(double VelocityScale)
@@ -41,10 +41,10 @@ int CIA402Axis::Axis_SetVelocityScale(double VelocityScale)
     return AEC_SUCCESSED;
 }
 
-int CIA402Axis::Axis_SetCurrentDirection(int CurrentDirection)
+int CIA402Axis::Axis_SetTorqueDirection(int TorqueDirection)
 {
-    m_stAxisConfiguration.nCurrentDirection = CurrentDirection;
-    nCurrentDirection = CurrentDirection;
+    m_stAxisConfiguration.nTorqueDirection = TorqueDirection;
+    nTorqueDirection = TorqueDirection;
     return AEC_SUCCESSED;
 }
 

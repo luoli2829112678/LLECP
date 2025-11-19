@@ -32,6 +32,11 @@ public:
     SMbasic(/* args */);
     ~SMbasic();
     void operator()(CIA402Axis* axis);
+    CIA402Axis Axis();
+    bool Busy();
+    bool Done();
+    bool Error();
+    bool ErrorID();
 protected:
     virtual void Execute();
 };

@@ -27,6 +27,7 @@ protected:
     bool m_bVirtual;
     bool m_bBusy;
     uint32_t m_nAxisID;
+    int m_nErrorCode;
     ST_CIA402_PDO m_stPDO_Virtual;
     //pdo同步
     ST_CIA402_PDO m_stMirrorPDO;
@@ -52,31 +53,43 @@ public:
     int nCmdControlWord;      // 控制字（主站发往从站）
     int nActStatusWord;       // 状态字（从站反馈主站）
 
-    // --- 目标位置信息 ---
+    // --- 目标运动参数 ---
     double dSetPosition;      // 目标位置（工程单位）
     int    TargetPosition_PDO;// 目标位置（PDO映射整数值）
-    // --- 目标运动参数 ---
     double dSetVelocity;      // 目标速度
+    int    TargetVelocity_PDO;// 目标位置（PDO映射整数值）
+    double dSetTorque;      // 目标力矩
+    int    TargetTorque_PDO;// 目标力矩（PDO映射整数值）
+
+
+    // --- 实际运动参数 ---
+    double dActPosition;      // 实际位置（工程单位）
+    int    nActualPosition_PDO;// 实际位置（PDO映射整数值）
+    double dActVelocity;      // 实际速度
+    int    ActualVelocity_PDO;// 实际位置（PDO映射整数值）
+    double dActTorque;      // 实际力矩
+    int    ActualTorque_PDO;// 实际力矩（PDO映射整数值）
+
+    int DigitalOutputs;
+    int DigitalInputs;
+
+
     // --- 补偿或控制器内部计算值 ---
     double dSetVelocity_c;    // 修正后速度（补偿）
     double dSetAcceleration_c;// 修正后加速度
     double dSetJerk_c;        // 修正后加加速度
-    double dSetVelocity_s;    // SoftMotion速度
-    double dSetAcceleration_s;// SoftMotion修正后加速度
-    double dSetJerk_s;        // SoftMotion修正后加加速度
-    double dSetSnap_s; 
-    double dSetCurrent;       // 目标电流/力矩（A 或 %）
-    int    nActualPosition_PDO; // 实际位置（PDO原始值）
-    double dActPosition;        // 实际位置（工程单位）
-    // --- 实际运动参数 ---
-    double dActVelocity;        // 实际速度
-    double dActAcceleration;    // 实际加速度
-    double dActJerk;            // 实际跃度
+
     // --- 实际补偿参数 ---
     double dActVelocity_c;      // 实际补偿后速度
     double dActAcceleration_c;  // 实际补偿后加速度
     double dActJerk_c;          // 实际补偿后跃度
-    double dActCurrent;         // 实际电流/力矩反馈
+
+
+    double dSetPosition_s;    // SoftMotion速度
+    double dSetVelocity_s;    // SoftMotion速度
+    double dSetAcceleration_s;// SoftMotion加速度
+    double dSetJerk_s;        // SoftMotion加加速度
+    double dSetSnap_s; 
 
     // 模式与错误信息（Mode / Error）
     int nCmdModeOpration;    // 当前指令的操作模式（例如 Profile Position、Cyclic Synchronous Position 等）
@@ -88,16 +101,15 @@ public:
     bool bVirtual;    
     uint32_t nAxisID;
     EN_AxisMotionState enAxisMotionState;
-    int m_nErrorCode;
     
     //config
     double dGearRatio;
     uint32_t nEncodeRatio;
     int nEncodeDirection;
     int nEncodeHomePos;
-    double dCurrentScales;
+    double dTorqueScales;
     double dVelocityScale;
-    int nCurrentDirection;
+    int nTorqueDirection;
     double dPositive;
     double dNegative;
 public:
@@ -181,11 +193,11 @@ public:
     //设置编码器原点，实时生效
     int Axis_SetEncodeHomePos(int32_t nEncodeHomePos);
     //设置电流常数，实时生效
-    int Axis_SetCurrentScales(double dCurrentScales);
+    int Axis_SetTorqueScales(double dTorqueScales);
     //设置速度常数
     int Axis_SetVelocityScale(double dVelocityScale);
     //设置电流方向，实时生效
-    int Axis_SetCurrentDirection(int nCurrentDirection);
+    int Axis_SetTorqueDirection(int nTorqueDirection);
     //设置硬件边界
     int Axis_SetSWLimit(double dPositive,double dNegative);
     //设置控制周期(ms)
@@ -196,6 +208,7 @@ public:
 
 
 protected:
+    int Axis_SetMotionPlanner(ST_InterParams stMotionPlanner);
     int Axis_SetTargetPosition(double TargetPosition);
     int Axis_SetTargetVelocity(double TargetVelocity);
     int Axis_SetTargetTorque(double TargetTorque);
@@ -203,6 +216,7 @@ protected:
 protected:
     //轴的实时函数
     void Axis_RT();
+    bool Axis_PDOErrorCheck();
     void DataSynchronization();
 };
 

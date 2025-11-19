@@ -8,6 +8,7 @@ void CIA402Axis::PDOsynchronization()
     PDO_SetTargetVelocity(m_stMirrorPDO.TargetVelocity);
     PDO_SetTargetTorque(m_stMirrorPDO.TargetTorque);
     PDO_SetModesOfOperation(m_stMirrorPDO.TargetModesOfOperation);
+    PDO_SetDigitalOutputs(m_stMirrorPDO.DigitalOutputs);
 
     PDO_ReadStatusWord(m_stMirrorPDO.StatusWord);
     PDO_ReadErrorCode(m_stMirrorPDO.ErrorCode);
@@ -15,16 +16,25 @@ void CIA402Axis::PDOsynchronization()
     PDO_ReadActualVelocity(m_stMirrorPDO.ActualVelocity);
     PDO_ReadActualTorque(m_stMirrorPDO.ActualTorque);
     PDO_ReadModesOfOperation(m_stMirrorPDO.ActualModesOfOperation);
+    PDO_ReadDigitalInputs(m_stMirrorPDO.DigitalInputs);
 }
 
 // ===== 写入（RxPDO） =====
 int CIA402Axis::PDO_SetControlword(uint16_t Controlword)
 {
+    if(NULL == m_st_map.pControlword)
+    {
+        return -1;
+    }
     PDO_CONTROLWORD = Controlword;
     return AEC_SUCCESSED;
 }
 int CIA402Axis::PDO_SetTargetPosition(int32_t TargetPosition)
 {
+    if(NULL == m_st_map.pTargetPosition)
+    {
+        return -1;
+    }
     PDO_TARGETPOSITION = TargetPosition;
     return AEC_SUCCESSED;
 }
@@ -48,37 +58,64 @@ int CIA402Axis::PDO_SetTargetTorque(int16_t TargetTorque)
 }
 int CIA402Axis::PDO_SetModesOfOperation(uint8_t mode)
 {
+    if(NULL == m_st_map.pTargetModesOfOperation)
+    {
+        return -1;
+    }
     PDO_TARGETMODESOFOPERATION = mode;
     return AEC_SUCCESSED;
 }
 int CIA402Axis::PDO_SetDigitalOutputs(uint32_t DigitalOutputs)
 {
+    if(NULL == m_st_map.pDigitalOutputs)
+    {
+        return -1;
+    }
     PDO_DIGITALOUTPUTS = DigitalOutputs;
     return AEC_SUCCESSED;
 }
 
 int CIA402Axis::PDO_ReadControlword(uint16_t& Controlword)
 {
+    if(NULL == m_st_map.pControlword)
+    {
+        return -1;
+    }
     Controlword = PDO_CONTROLWORD;
     return AEC_SUCCESSED;
 }
 int CIA402Axis::PDO_ReadTargetPosition(int32_t& TargetPosition)
 {
-    TargetPosition = PDO_TARGETPOSITION;
+    if(NULL == m_st_map.pTargetPosition)
+    {
+        return -1;
+    }
     return AEC_SUCCESSED;
 }
 int CIA402Axis::PDO_ReadTargetVelocity(int32_t& TargetVelocity)
 {
+    if(NULL == m_st_map.pTargetVelocity)
+    {
+        return -1;
+    }
     TargetVelocity = PDO_TARGETVELOCITY;
     return AEC_SUCCESSED;
 }
 int CIA402Axis::PDO_ReadTargetTorque(int16_t& TargetTorque)
 {
+    if(NULL == m_st_map.pTargetTorque)
+    {
+        return -1;
+    }
     TargetTorque = PDO_TARGETTORQUE;
     return AEC_SUCCESSED;
 }
 int CIA402Axis::PDO_ReadTargetModesOfOperation(uint8_t& mode)
 {
+    if(NULL == m_st_map.pTargetModesOfOperation)
+    {
+        return -1;
+    }
     mode = PDO_TARGETMODESOFOPERATION;
     return AEC_SUCCESSED;
 }
@@ -86,6 +123,10 @@ int CIA402Axis::PDO_ReadTargetModesOfOperation(uint8_t& mode)
 // ===== 读取（TxPDO） =====
 int CIA402Axis::PDO_ReadStatusWord(uint16_t& StatusWord)
 {
+    if(NULL == m_st_map.pStatusWord)
+    {
+        return -1;
+    }
     StatusWord = PDO_STATUSWORD;
     return AEC_SUCCESSED;
 }
@@ -123,16 +164,28 @@ int CIA402Axis::PDO_ReadActualTorque(int16_t& ActualTorque)
 }
 int CIA402Axis::PDO_ReadModesOfOperation(uint8_t& mode)
 {
+    if(NULL == m_st_map.pActualModesOfOperation)
+    {
+        return -1;
+    }
     mode = PDO_ACTUALMODESOFOPERATION;
     return AEC_SUCCESSED;
 }
 int CIA402Axis::PDO_ReadDigitalInputs(uint32_t& inputs)
 {
+    if(NULL == m_st_map.pDigitalInputs)
+    {
+        return -1;
+    }
     inputs = PDO_DIGITALINPUTS;
     return AEC_SUCCESSED;
 }
 int CIA402Axis::PDO_ReadDigitalOutputs(uint32_t& outputs)
 {
+    if(NULL == m_st_map.pDigitalOutputs)
+    {
+        return -1;
+    }
     outputs = PDO_DIGITALOUTPUTS;
     return AEC_SUCCESSED;
 }

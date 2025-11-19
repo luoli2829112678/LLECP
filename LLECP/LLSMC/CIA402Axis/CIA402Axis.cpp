@@ -71,12 +71,14 @@ EN_AxisMotionState CIA402Axis::Axis_ReadAxisState()
 
 bool CIA402Axis::Axis_CheckError(int& nErrorID)
 {
+    bool res = Axis_PDOErrorCheck();
     nErrorID = m_nErrorCode;
-    return(motionState_errorstop == m_enAxisMotionState);
+    return(res);
 }
 bool CIA402Axis::Axis_CheckError()
 {
-    return(motionState_errorstop == m_enAxisMotionState);
+    bool res = Axis_PDOErrorCheck();
+    return res;
 }
 
 int CIA402Axis::Axis_ResetError()
@@ -134,9 +136,16 @@ int CIA402Axis::Axis_GetMotionUint(ST_MotionUint& stMotionUint)
 }
 
 
+bool CIA402Axis::Axis_PDOErrorCheck()
+{
+    bool statuswordCheck = (m_stMirrorPDO.StatusWord & en_StatusWord_f) != 0;
+    //errorCodeCheck
+    return statuswordCheck;
+}
 
 void CIA402Axis::Axis_RT()
 {
+    Axis_PDOErrorCheck();
     PDOsynchronization();
     DataSynchronization();
     return;
@@ -145,21 +154,29 @@ void CIA402Axis::Axis_RT()
 void CIA402Axis::DataSynchronization()
 {
     //PDO
-    nCmdControlWord = *m_st_map.pControlword;
-    nActStatusWord = *m_st_map.pStatusWord;
-    TargetPosition_PDO = *m_st_map.pTargetPosition;
-    nActualPosition_PDO = *m_st_map.pActualPosition;
-    nCmdModeOpration = *m_st_map.pTargetModesOfOperation;
-    nActModeOpration = *m_st_map.pActualModesOfOperation;
-
+    nCmdControlWord = m_stMirrorPDO.Controlword;
+    nActStatusWord = m_stMirrorPDO.StatusWord;
+    TargetPosition_PDO = m_stMirrorPDO.TargetPosition;
+    nActualPosition_PDO = m_stMirrorPDO.ActualPosition;
+    nCmdModeOpration = m_stMirrorPDO.TargetModesOfOperation;
+    nActModeOpration = m_stMirrorPDO.ActualModesOfOperation;
+    TargetTorque_PDO  = m_stMirrorPDO.TargetTorque;
+    ActualTorque_PDO = m_stMirrorPDO.ActualTorque;
+    TargetVelocity_PDO = m_stMirrorPDO.TargetVelocity;
+    ActualVelocity_PDO =  m_stMirrorPDO.ActualVelocity;
+    nAxisErrorID        = m_stMirrorPDO.ErrorCode;
+    DigitalOutputs = m_stMirrorPDO.DigitalOutputs;
+    DigitalInputs = m_stMirrorPDO.DigitalInputs;
 
     //运动数据
     dSetPosition = m_stAxisMotionData_now.dTarPos = m_stAxisConfiguration.nEncodeDirection * 
-                        double(TargetPosition_PDO - m_stAxisConfiguration.nEncodeHomePos) / 
+                        double(m_stMirrorPDO.TargetPosition - m_stAxisConfiguration.nEncodeHomePos) / 
                         double(m_stAxisConfiguration.nEncodeRatio * m_stAxisConfiguration.dGearRatio);
     dActPosition = m_stAxisMotionData_now.dTarPos = m_stAxisConfiguration.nEncodeDirection * 
-                                        double(*m_st_map.pActualPosition - m_stAxisConfiguration.nEncodeHomePos) / 
+                                        double(m_stMirrorPDO.ActualPosition - m_stAxisConfiguration.nEncodeHomePos) / 
                                         double(m_stAxisConfiguration.nEncodeRatio * m_stAxisConfiguration.dGearRatio);
+    dSetTorque =   m_stAxisMotionData_now.dActCur = m_stMirrorPDO.TargetTorque / m_stAxisConfiguration.dTorqueScales * m_stAxisConfiguration.nTorqueDirection;    
+    dActTorque =   m_stAxisMotionData_now.dActCur = m_stMirrorPDO.ActualTorque / m_stAxisConfiguration.dTorqueScales * m_stAxisConfiguration.nTorqueDirection;                  
     //状态
     nAxisErrorID = m_nErrorCode;
     bBusy     = m_bBusy;
@@ -171,8 +188,8 @@ void CIA402Axis::DataSynchronization()
     nEncodeRatio = m_stAxisConfiguration.nEncodeRatio;
     nEncodeDirection = m_stAxisConfiguration.nEncodeDirection;
     nEncodeHomePos = m_stAxisConfiguration.nEncodeHomePos;
-    dCurrentScales = m_stAxisConfiguration.dCurrentScales;
+    dTorqueScales = m_stAxisConfiguration.dTorqueScales;
     dVelocityScale = m_stAxisConfiguration.dVelocityScale;
-    nCurrentDirection = m_stAxisConfiguration.nCurrentDirection;
+    nTorqueDirection = m_stAxisConfiguration.nTorqueDirection;
     return;
 }

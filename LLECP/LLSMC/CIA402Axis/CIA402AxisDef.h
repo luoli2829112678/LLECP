@@ -13,18 +13,23 @@
 struct ST_CIA402_PDO
 {
     uint16_t   Controlword;
-    uint16_t   StatusWord;
-    uint16_t   ErrorCode;
     int32_t    TargetPosition;
     int32_t    TargetVelocity;
     int16_t    TargetTorque;
     uint8_t    TargetModesOfOperation;
+    uint32_t   DigitalOutputs;
+    uint32_t   TouchProbeFunction;
+    uint32_t   AddVelocityValue;
+    uint32_t   AddTorqueValue;
+
+    uint16_t   StatusWord;
     int32_t    ActualPosition;
     int32_t    ActualVelocity;
     int16_t    ActualTorque;
     uint8_t    ActualModesOfOperation;
+    uint32_t   TouchProbeStatus;
     uint32_t   DigitalInputs;
-    uint32_t   DigitalOutputs;
+    uint16_t   ErrorCode;
 };
 
 //该映射遵照CanOpen402协议
@@ -42,7 +47,12 @@ struct ST_SMCInitMap
     int16_t*    pActualTorque;
     uint8_t*    pActualModesOfOperation;
     uint32_t*   pDigitalInputs;
-    uint32_t*   pDigitalOutputs;    
+    uint32_t*   pDigitalOutputs;  
+    
+    uint32_t*   pTouchProbeFunction;
+    uint32_t*   pAddVelocityValue;
+    uint32_t*   pAddTorqueValue;
+    uint32_t*   pTouchProbeStatus;
     ST_SMCInitMap()
     {
         pStatusWord = nullptr;
@@ -57,8 +67,57 @@ struct ST_SMCInitMap
         pActualModesOfOperation = nullptr;
         pDigitalInputs = nullptr;
         pDigitalOutputs = nullptr;
+        pTouchProbeFunction = nullptr;
+        pAddVelocityValue = nullptr;
+        pAddTorqueValue = nullptr;
+        pTouchProbeStatus = nullptr;
     }
 };
+
+typedef enum
+{
+    en_ControlWord_Init                     = 0, 
+    en_ControlWord_so                       = 1 << 0,  
+    en_ControlWord_ev                       = 1 << 1,
+    en_ControlWord_qs                       = 1 << 2,
+    en_ControlWord_eo                       = 1 << 3,
+    en_ControlWord_oms0                     = 1 << 4,
+    en_ControlWord_oms1                     = 1 << 5,
+    en_ControlWord_oms2                     = 1 << 6,
+    en_ControlWord_fr                       = 1 << 7,
+    en_ControlWord_h                        = 1 << 8,
+    en_ControlWord_oms3                     = 1 << 9,
+    en_ControlWord_r                        = 1 << 10,
+    en_ControlWord_ms1                      = 1 << 11,
+    en_ControlWord_ms2                      = 1 << 12,
+    en_ControlWord_ms3                      = 1 << 13,
+    en_ControlWord_ms4                      = 1 << 14,
+    en_ControlWord_ms5                      = 1 << 15,
+
+} EN_SMC_ControlWord;
+
+typedef enum// : EC_T_USHORT
+{
+	en_StatusWord_rtso                      = 1 << 0,
+	en_StatusWord_so                        = 1 << 1,
+	en_StatusWord_oe                        = 1 << 2,
+	en_StatusWord_f                         = 1 << 3,
+	en_StatusWord_ve                        = 1 << 4,
+	en_StatusWord_qs                        = 1 << 5,
+	en_StatusWord_sod                       = 1 << 6,
+	en_StatusWord_w                         = 1 << 7,
+	en_StatusWord_ms                        = 1 << 8,
+	en_StatusWord_rm                        = 1 << 9,
+	en_StatusWord_tr                        = 1 << 10,
+	en_StatusWord_ila                       = 1 << 11,
+	en_StatusWord_oms1                      = 1 << 12,
+	en_StatusWord_oms2                      = 1 << 13,
+	en_StatusWord_ms1                       = 1 << 14,
+	en_StatusWord_ms2                       = 1 << 15,
+} EN_SMC_StatusWord;
+
+
+
 
 // 运动方向
 enum EN_Direction
@@ -170,9 +229,9 @@ struct ST_SMCAxisConfiguration
     uint32_t nEncodeRatio;
     int nEncodeDirection;
     int nEncodeHomePos;
-    double dCurrentScales;
+    double dTorqueScales;
     double dVelocityScale;
-    int nCurrentDirection;
+    int nTorqueDirection;
     double dPositive;
     double dNegative;
     ST_SMCAxisConfiguration()
@@ -181,8 +240,8 @@ struct ST_SMCAxisConfiguration
         nEncodeRatio = 131072;
         nEncodeDirection = 1;
         nEncodeHomePos = 0;
-        dCurrentScales = 1;
-        nCurrentDirection = 1;
+        dTorqueScales = 1;
+        nTorqueDirection = 1;
         dNegative = 0;
         dPositive = 0;
     }
