@@ -26,6 +26,7 @@ void MC_MoveRelative::operator()(CIA402Axis* axis,bool bExecute,double dPosition
     m_MotionUint_New.BufferMode                         = enBufferMode;
     m_MotionUint_New.MoveType                           = enRelativMotion;
     m_MotionUint_New.fbID                               = this;
+    m_MotionUint_New.fCallback                          = m_fCallback;
     this->Execute();
     bDone = m_bDone;
     bBusy = m_bBusy;
@@ -80,6 +81,7 @@ void MC_MoveRelative::Execute()
     if(m_Timer.R_TRIG(m_bExecute))
     {
         m_MotionUint = m_MotionUint_New;
+        m_pCIA402Axis->Axis_SetAxisState(EN_AxisMotionState::motionState_discrete_motion);
         m_pCIA402Axis->Axis_PushMotionUint(m_MotionUint);
     }
     //参数变更push

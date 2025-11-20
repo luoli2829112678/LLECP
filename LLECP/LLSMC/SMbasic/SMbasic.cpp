@@ -3,6 +3,7 @@
 
 SMbasic::SMbasic(/* args */)
 {
+    m_fCallback = [this](bool bBusy,bool bDone,bool bCommandAborted,bool bError,int nErrorID){this->SetFBStatus(bBusy,bDone,bCommandAborted,bError,nErrorID);};
 }
 
 SMbasic::~SMbasic()
@@ -43,4 +44,12 @@ bool SMbasic::ErrorID()
 {
     Execute();
     return m_nErrorID;
+}
+int SMbasic::SetFBStatus(bool bBusy,bool bDone,bool bCommandAborted,bool bError,int nErrorID)
+{
+    m_bBusy = bBusy;
+    m_bDone = bDone;
+    m_bCommandAborted = bCommandAborted;
+    m_bError = bError;
+    m_nErrorID = nErrorID;
 }

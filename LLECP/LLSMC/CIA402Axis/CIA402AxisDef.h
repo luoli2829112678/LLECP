@@ -178,8 +178,18 @@ struct ST_MotionUint
     EN_BufferMode BufferMode;
     EN_MoveType MoveType;
     void* fbID;//功能块指针
+    //回调函数
+    std::function<void(bool, bool, bool, bool, int)> fCallback;
     bool bMotion;
     bool bMotionDone;
+    void SetFBStauts(bool bBusy,bool bDone,bool bCommandAborted,bool bError,int nErrorID)
+    {
+        bMotionDone = bDone;
+        bMotion = bBusy;
+        if (fCallback) 
+            fCallback(bBusy,bDone,bCommandAborted,bError,nErrorID);
+        return;
+    }
 };
 
 struct ST_Factor

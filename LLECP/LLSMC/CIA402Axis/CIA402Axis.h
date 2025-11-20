@@ -33,6 +33,8 @@ protected:
     ST_CIA402_PDO m_stMirrorPDO;
     ST_SMCInitMap m_st_map;
     ST_SMCAxisConfiguration m_stAxisConfiguration;
+    bool m_bCyclicSyncMotion;
+    int16_t m_nCyclicSyncMotionLosCount;
     double m_dControlCycle;//ms
 
     //Data
@@ -126,9 +128,12 @@ protected:
     int Axis_ResetError();
     int Axis_SetInterFrame(ST_InterParams stInterParamsData);
 
+    void Axis_SetCyclicSyncMotion();
+
     //PDO镜像直接控制pdo
 
     void PDOsynchronization();
+    void AxisStatusCheck();
     // ===== 写入（RxPDO） =====
     int PDO_SetControlword(uint16_t Controlword);
     int PDO_SetTargetPosition(int32_t TargetPosition);

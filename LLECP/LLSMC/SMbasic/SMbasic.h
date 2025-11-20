@@ -1,14 +1,18 @@
 #ifndef SMbasic_H
 #define SMbasic_H
 #include"../SoftMotion/SoftMotion.h"
-#include"SMbasicErrorCode.h"
+#include"../SoftMotion/SMbasicErrorCode.h"
 #include"SMbasicDef.h"
+
 class SMbasic
 {
+    friend class SoftMotion;
 protected:
     CIA402Axis* m_pCIA402Axis = nullptr;
     SMCTimer m_Timer;
     SMCTimer m_TimerTimeout;
+    //回调函数
+    std::function<void (bool, bool, bool, bool, int)> m_fCallback;
 
     //Move类
     bool m_bExecute;
@@ -37,7 +41,9 @@ public:
     bool Done();
     bool Error();
     bool ErrorID();
+    
 protected:
+    int SetFBStatus(bool bBusy,bool bDone,bool bCommandAborted,bool bError,int nErrorID);
     virtual void Execute();
 };
 #endif // SMbasic_H

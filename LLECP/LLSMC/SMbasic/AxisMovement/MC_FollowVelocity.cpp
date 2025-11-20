@@ -48,6 +48,8 @@ void MC_FollowVelocity::Execute()
     int res = AEC_SUCCESSED;
     if(m_bExecute)
     {
+        if(EN_ModesOfOperation::enModeCyclicSyncVelocity== m_pCIA402Axis->nActModeOpration)
+            m_pCIA402Axis->Axis_SetAxisState(EN_AxisMotionState::motionState_synchronized_motion);
         res = m_pCIA402Axis->Axis_SetTargetVelocity(m_dVelocity);
     }
     if(AEC_SUCCESSED != res)

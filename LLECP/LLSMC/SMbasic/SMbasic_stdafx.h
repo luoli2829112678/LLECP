@@ -4,6 +4,7 @@
 
 #include "AxisConfig/MC_SetEncodeRatio.h"
 #include "AxisConfig/MC_SetGearingRatio.h"
+#include "AxisConfig/MC_SetPosition.h"
 #include "AxisConfig/MC_SetSWLimit.h"
 
 #include "AxisControl/MC_ClearFault.h"
@@ -19,7 +20,6 @@
 #include "AxisMovement/MC_MoveRelative.h"
 #include "AxisMovement/MC_MoveVelocity.h"
 #include "AxisMovement/MC_SetOverride.h"
-#include "AxisMovement/MC_SetPosition.h"
 #include "AxisMovement/MC_Stop.h"
 
 #include "AxisRead/MC_ReadActualPosition.h"

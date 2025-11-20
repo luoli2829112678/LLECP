@@ -16,7 +16,7 @@
 #include"RT_Script.h"
 #include"EtherCATMaster.h"
 
-#define SM main
+#define SM_Test main
 
 
 int RT_ScripTest() 
@@ -49,6 +49,7 @@ MC_PowerOn fbMC_PowerOn;
 MC_Stop fbMC_Stop;
 MC_Reset fbMC_Reset;
 MC_PowerOff fbMC_PowerOff;
+MC_FollowPosition fbFollowPosition;
 MC_InitResetAxis fbMC_InitResetAxis;
 MC_MoveAbsolute fbMoveAbsolute;
 MC_MoveRelative fbMoveRelative;
@@ -60,13 +61,13 @@ timespec ti_Sleep;
 int SM_Test()
 {
     int c = 0;
+    double pos = 0;
     v_Axis.clear();
     EtherCATMaster* pMaster = new EtherCATMaster(0);  
     pMaster->StartMaster();//启动主站
     pMaster->ConstructionCIA402AxisVec(&v_Axis);//主站从从站获取生成轴
     pSoftMotion = new SoftMotion(v_Axis);//使用轴初始化softmotion
-    pSoftMotion->SetSoftMotionCycle(0.001);//设置softmotion周期
-    MC_InitResetAxis fbMC_InitResetAxis;//定义初始复位功能块
+    pSoftMotion->SetSoftMotionCycle(0.0005);//设置softmotion周期
     MC_PowerOn fbMC_PowerOn;
     struct timespec ts{0, 500000};   // 0 秒 + 1 000 000 纳秒 = 1 毫秒
     printf("InitReset\n");
@@ -93,28 +94,17 @@ int SM_Test()
             fbMC_PowerOn(v_Axis[0],true,bBusy,bDone,bError,nErrorID);//执行使能功能块
         if(bDone)
         {
-            printf("EnableFinish%d\n",c);
-            c++;
-            if(c>2000)//2000周期后复位
-            {
-                c = 0;
-                //fbMC_PowerOff(v_Axis[0],false,bBusy,bDone,bError,nErrorID);//初始化去使能功能块
-                fbMC_Reset(v_Axis[0],false,bBusy,bDone,bError,nErrorID);//初始化复位功能块
-                break;
-            }
+            break;
         }
         pSoftMotion->SoftMotionRun();
         nanosleep(&ts, nullptr);
     }
+
     while (true)
     {
-        fbMC_Reset(v_Axis[0],true,bBusy,bDone,bError,nErrorID);
-        //fbMC_PowerOff(v_Axis[0],true,bBusy,bDone,bError,nErrorID);
-        if(bDone)
-        {
-            printf("DisableFinish\n");
-             break;
-        }
+        pos = v_Axis[0]->dActPosition - 0.01;
+        printf("RunPos:%.6f\n",pos);
+        fbFollowPosition(v_Axis[0],true,pos,bBusy,bError,nErrorID);
         pSoftMotion->SoftMotionRun();
         nanosleep(&ts, nullptr);
     }
@@ -160,54 +150,55 @@ int SM()
             //printf("SetMovePos:%f\n",rel);
             // fbMoveAbsolute(v_Axis[0],false,pos+rel,0.5,0.1,0.1,100,EN_Direction::enPositive,EN_BufferMode::enAborting,bDone,bBusy,bCommandAborted,bError,nErrorID);
             // fbMoveAbsolute(v_Axis[0],true,0,0.5,0.1,0.1,100,EN_Direction::enPositive,EN_BufferMode::enAborting,bDone,bBusy,bCommandAborted,bError,nErrorID);
-            // fbMoveRelative(v_Axis[0],false,rel,0.5,0.1,0.1,100,EN_Direction::enPositive,EN_BufferMode::enAborting,bDone,bBusy,bCommandAborted,bError,nErrorID);
-            // fbMoveRelative(v_Axis[0],true,rel,0.5,0.1,0.1,100,EN_Direction::enPositive,EN_BufferMode::enAborting,bDone,bBusy,bCommandAborted,bError,nErrorID);
-            fbMoveVelocity(v_Axis[0],false,0.5,0.1,10,100,EN_Direction::enPositive,bInVelocity,bBusy,bCommandAborted,bError,nErrorID);
-            fbMoveVelocity(v_Axis[0],true,0.5,0.1,10,100,EN_Direction::enPositive,bInVelocity,bBusy,bCommandAborted,bError,nErrorID);
+            fbMoveRelative(v_Axis[0],false,rel,0.5,0.1,0.1,100,EN_Direction::enPositive,EN_BufferMode::enAborting,bDone,bBusy,bCommandAborted,bError,nErrorID);
+            fbMoveRelative(v_Axis[0],true,rel,0.5,0.1,0.1,100,EN_Direction::enPositive,EN_BufferMode::enAborting,bDone,bBusy,bCommandAborted,bError,nErrorID);
+            // fbMoveVelocity(v_Axis[0],false,0.5,0.1,10,100,EN_Direction::enPositive,bInVelocity,bBusy,bCommandAborted,bError,nErrorID);
+            // fbMoveVelocity(v_Axis[0],true,0.5,0.1,10,100,EN_Direction::enPositive,bInVelocity,bBusy,bCommandAborted,bError,nErrorID);
             c = 0;
             break;
         }
         pSoftMotion->SoftMotionRun();
         nanosleep(&ts, nullptr);
     }
-    while (true)
-    {
-        c = c+1;
-        if(c>30000)
-        {
-            printf("Stop\n");
-            fbMC_Stop(v_Axis[0],false,0.05,100,bDone,bBusy,bCommandAborted,bError,nErrorID);
-            fbMC_Stop(v_Axis[0],true,0.05,100,bDone,bBusy,bCommandAborted,bError,nErrorID);
-            c = 0;
-            break;
-        }
+    // while (true)
+    // {
+    //     c = c+1;
+    //     if(c>30000)
+    //     {
+    //         printf("Stop\n");
+    //         fbMC_Stop(v_Axis[0],false,0.05,100,bDone,bBusy,bCommandAborted,bError,nErrorID);
+    //         fbMC_Stop(v_Axis[0],true,0.05,100,bDone,bBusy,bCommandAborted,bError,nErrorID);
+    //         c = 0;
+    //         break;
+    //     }
 
-        pSoftMotion->SoftMotionRun();
-        nanosleep(&ts, nullptr);
-    }
-    while (true)
-    {
-        if(fbMC_Stop.Done())
-        {
-            fbMC_Stop(v_Axis[0],false,10,100,bDone,bBusy,bCommandAborted,bError,nErrorID);
-            if(bDone)
-            {
-                printf("Stopfinish\n");
-                break;
-            }
-        }
-        pSoftMotion->SoftMotionRun();
-        nanosleep(&ts, nullptr);
-    }
-    while (true)
-    {
-        pSoftMotion->SoftMotionRun();
-        nanosleep(&ts, nullptr);
-    }
+    //     pSoftMotion->SoftMotionRun();
+    //     nanosleep(&ts, nullptr);
+    // }
+    // while (true)
+    // {
+    //     if(fbMC_Stop.Done())
+    //     {
+    //         fbMC_Stop(v_Axis[0],false,10,100,bDone,bBusy,bCommandAborted,bError,nErrorID);
+    //         if(bDone)
+    //         {
+    //             printf("Stopfinish\n");
+    //             break;
+    //         }
+    //     }
+    //     pSoftMotion->SoftMotionRun();
+    //     nanosleep(&ts, nullptr);
+    // }
+    // while (true)
+    // {
+    //     pSoftMotion->SoftMotionRun();
+    //     nanosleep(&ts, nullptr);
+    // }
     while (true)
     {
         //fbMoveAbsolute(v_Axis[0],true,pos+rel,0.5,0.1,0.1,100,EN_Direction::enPositive,EN_BufferMode::enAborting,bDone,bBusy,bCommandAborted,bError,nErrorID);
-        //fbMoveRelative(v_Axis[0],true,rel,0.5,0.1,10,100,EN_Direction::enPositive,EN_BufferMode::enAborting,bDone,bBusy,bCommandAborted,bError,nErrorID);
+        fbMoveRelative(v_Axis[0],true,rel,0.5,0.1,10,100,EN_Direction::enPositive,EN_BufferMode::enAborting,bDone,bBusy,bCommandAborted,bError,nErrorID);
+        printf("done:%d,busy:%d,error:%d\n",bDone,bBusy,bError);
         ///if(fbMoveAbsolute.Done())
         if(fbMoveRelative.Done())
         {

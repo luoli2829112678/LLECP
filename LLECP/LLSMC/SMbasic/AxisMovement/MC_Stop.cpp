@@ -23,6 +23,7 @@ void MC_Stop::operator()(CIA402Axis* axis,bool bExecute,double dDeceleration,dou
     m_MotionUint_New.PlanningMotionParam.PlanningMode   = enStopPlanningMode;
     m_MotionUint_New.MoveType                           = enRelativMotion;
     m_MotionUint_New.fbID                               = this;
+    m_MotionUint_New.fCallback                          = m_fCallback;
     this->Execute();
     bDone = m_bDone;
     bBusy = m_bBusy;
@@ -57,6 +58,7 @@ void MC_Stop::Execute()
     {
         if((EN_AxisMotionState::motionState_standstill != m_pCIA402Axis->Axis_ReadAxisState()) &&
              (EN_AxisMotionState::motionState_continuous_motion!= m_pCIA402Axis->Axis_ReadAxisState()) &&
+              (EN_AxisMotionState::motionState_stopping!= m_pCIA402Axis->Axis_ReadAxisState()) &&
                 (EN_AxisMotionState::motionState_discrete_motion!= m_pCIA402Axis->Axis_ReadAxisState()))
         {
             m_nErrorID = SMEC_AXIS_STATUS_INTERCEPTION;
@@ -76,7 +78,14 @@ void MC_Stop::Execute()
     //上升沿push
     if(m_Timer.R_TRIG(m_bExecute))
     {
+        //未运动直接完成
+        if(motionState_standstill == m_pCIA402Axis->Axis_ReadAxisState())
+        {
+            m_bDone = true;
+            return;
+        }
         m_MotionUint = m_MotionUint_New;
+        m_pCIA402Axis->Axis_SetAxisState(EN_AxisMotionState::motionState_stopping);
         m_pCIA402Axis->Axis_PushMotionUint(m_MotionUint);
     }
     //参数变更push

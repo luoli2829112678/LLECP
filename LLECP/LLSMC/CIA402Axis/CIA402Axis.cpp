@@ -146,8 +146,10 @@ bool CIA402Axis::Axis_PDOErrorCheck()
 void CIA402Axis::Axis_RT()
 {
     Axis_PDOErrorCheck();
+    AxisStatusCheck();
     PDOsynchronization();
     DataSynchronization();
+    m_bCyclicSyncMotion = false;
     return;
 }
 
@@ -191,5 +193,29 @@ void CIA402Axis::DataSynchronization()
     dTorqueScales = m_stAxisConfiguration.dTorqueScales;
     dVelocityScale = m_stAxisConfiguration.dVelocityScale;
     nTorqueDirection = m_stAxisConfiguration.nTorqueDirection;
+    return;
+}
+
+void CIA402Axis::AxisStatusCheck()
+{
+    if(EN_AxisMotionState::motionState_synchronized_motion == m_enAxisMotionState)
+    {
+        if(m_bCyclicSyncMotion)
+        {
+            m_bCyclicSyncMotion = false;
+        }
+        else
+        {
+            m_nCyclicSyncMotionLosCount ++;
+        }
+        if(m_nCyclicSyncMotionLosCount>2)
+        {
+            Axis_SetAxisState(EN_AxisMotionState::motionState_standstill);
+        }
+    }
+    else
+    {
+        m_nCyclicSyncMotionLosCount = 0;
+    }
     return;
 }

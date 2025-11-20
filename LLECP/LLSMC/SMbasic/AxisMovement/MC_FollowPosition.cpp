@@ -41,6 +41,12 @@ void MC_FollowPosition::Execute()
         m_nErrorID = SMEC_INVALID_AXIS;
         return;
     }
+    if((m_pCIA402Axis->Axis_ReadAxisState()!=EN_AxisMotionState::motionState_standstill)&&(m_pCIA402Axis->Axis_ReadAxisState()!=EN_AxisMotionState::motionState_continuous_motion))
+    {
+        m_bError = true;
+        m_nErrorID = SMEC_AXIS_STATUS_INTERCEPTION;
+        return;
+    }
     //输出初始化
     m_bBusy             = false;
     m_bError            = false;
@@ -48,6 +54,9 @@ void MC_FollowPosition::Execute()
     int res = AEC_SUCCESSED;
     if(m_bExecute)
     {
+        if(EN_ModesOfOperation::enModeCyclicSyncPosition== m_pCIA402Axis->nActModeOpration)
+            m_pCIA402Axis->Axis_SetAxisState(EN_AxisMotionState::motionState_synchronized_motion);
+        m_pCIA402Axis->Axis_SetCyclicSyncMotion();
         res = m_pCIA402Axis->Axis_SetTargetPosition(m_dPosition);
     }
     if(AEC_SUCCESSED != res)

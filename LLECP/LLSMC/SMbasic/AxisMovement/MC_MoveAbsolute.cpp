@@ -26,6 +26,7 @@ void MC_MoveAbsolute::operator()(CIA402Axis* axis,bool bExecute,double dPosition
     m_MotionUint_New.BufferMode                         = enBufferMode;
     m_MotionUint_New.MoveType                           = enAbsoluteMotion;
     m_MotionUint_New.fbID                               = this;
+    m_MotionUint_New.fCallback                          = m_fCallback;
     this->Execute();
     bDone = m_bDone;
     bBusy = m_bBusy;
@@ -79,6 +80,7 @@ void MC_MoveAbsolute::Execute()
     //上升沿push
     if(m_Timer.R_TRIG(m_bExecute))
     {
+        m_pCIA402Axis->Axis_SetAxisState(EN_AxisMotionState::motionState_discrete_motion);
         m_MotionUint = m_MotionUint_New;
         m_pCIA402Axis->Axis_PushMotionUint(m_MotionUint);
     }

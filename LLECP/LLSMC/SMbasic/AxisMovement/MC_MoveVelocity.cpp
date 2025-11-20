@@ -24,6 +24,7 @@ void MC_MoveVelocity::operator()(CIA402Axis* axis,bool bExecute,double dVelocity
     m_MotionUint_New.PlanningMotionParam.PlanningMode   = enVelocityPlanningMode;
     m_MotionUint_New.MoveType                           = enMoveTypeNull;
     m_MotionUint_New.fbID                               = this;
+    m_MotionUint_New.fCallback                          = m_fCallback;
     //方向初始化
     m_MotionUint_New.PlanningMotionParam.vel = abs(m_MotionUint_New.PlanningMotionParam.vel)*m_MotionUint_New.PlanningMotionParam.Direction;
     this->Execute();
@@ -79,6 +80,7 @@ void MC_MoveVelocity::Execute()
     //上升沿push
     if(m_Timer.R_TRIG(m_bExecute))
     {
+        m_pCIA402Axis->Axis_SetAxisState(EN_AxisMotionState::motionState_continuous_motion);
         m_MotionUint = m_MotionUint_New;
         m_pCIA402Axis->Axis_PushMotionUint(m_MotionUint);
     }

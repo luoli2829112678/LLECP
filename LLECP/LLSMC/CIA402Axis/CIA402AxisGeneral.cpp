@@ -19,6 +19,7 @@ int CIA402Axis::Axis_SetMotionPlanner(ST_InterParams stMotionPlanner)
         printf("m_stMirrorPDO.ActualModesOfOperationError%d\n",m_stMirrorPDO.ActualModesOfOperation);
         break;
     }
+    return AEC_SUCCESSED;
 }
 
 int CIA402Axis::Axis_SetTargetPosition(double TargetPosition)
@@ -43,4 +44,8 @@ int CIA402Axis::Axis_SetTargetVelocity(double TargetVelocity)
     int32_t count = TargetVelocity * m_stAxisConfiguration.nTorqueDirection * m_stAxisConfiguration.dVelocityScale;
     Axis_PDO_SetTargetVelocity(count);  
     return AEC_SUCCESSED;  
+}
+void CIA402Axis::Axis_SetCyclicSyncMotion()
+{
+    m_bCyclicSyncMotion = true;
 }

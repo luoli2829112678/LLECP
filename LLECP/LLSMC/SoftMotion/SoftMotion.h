@@ -1,6 +1,8 @@
 #pragma once
 #include<vector>
+#include <cmath>
 #include"../CIA402Axis/CIA402Axis.h"
+#include"SMbasicErrorCode.h"
 #include"motion_algorithm/motion_planning/motion_planning.h"
 #define MaxSnap 20000000
 
