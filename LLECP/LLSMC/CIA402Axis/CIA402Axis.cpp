@@ -110,6 +110,11 @@ int CIA402Axis::Axis_PushMotionUint(const ST_MotionUint STMotionUint)
     }
     if(enPositionPlanningMode != STMotionUint.PlanningMotionParam.PlanningMode)
     {
+        //占用回调
+        for(size_t i = 0;i < m_stSoftMotionEX.vMotionUint.size();i++)
+        {
+            m_stSoftMotionEX.vMotionUint[i].SetFBStauts(false,false,true,false,AEC_SUCCESSED);
+        }
         m_stSoftMotionEX.vMotionUint.clear();
     }
     //缓存点位

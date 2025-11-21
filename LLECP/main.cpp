@@ -99,10 +99,10 @@ int SM_Test()
         pSoftMotion->SoftMotionRun();
         nanosleep(&ts, nullptr);
     }
-
+    pos = v_Axis[0]->dActPosition;
     while (true)
     {
-        pos = v_Axis[0]->dActPosition - 0.01;
+        pos = pos - 0.0005;
         printf("RunPos:%.6f\n",pos);
         fbFollowPosition(v_Axis[0],true,pos,bBusy,bError,nErrorID);
         pSoftMotion->SoftMotionRun();

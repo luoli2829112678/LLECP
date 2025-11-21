@@ -2,6 +2,7 @@ foreach(EXAMPLE
 		RT_ScriptExamples 
 		MotionPlanningExamples
     EtherCATMasterExamples
+    STExecEngineExamples
     )
     add_executable(${EXAMPLE} ${EXAMPLE}.cpp)
     target_link_libraries(${EXAMPLE} PUBLIC 
@@ -10,5 +11,6 @@ foreach(EXAMPLE
     EtherCATMaster
     SoftMotion
     motion_algorithm
+    STExecEngine
     )
 endforeach()

@@ -89,6 +89,26 @@
             ]
         },
         {
+            "name": "调试 STExecEngineExamples",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/LLETC/STExecEngineExamples",  // ✅ 你构建出来的目标路径
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "启用 pretty-printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "调试 LLSMCExamples",
             "type": "cppdbg",
             "request": "launch",

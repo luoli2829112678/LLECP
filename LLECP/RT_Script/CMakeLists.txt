@@ -1,4 +1,5 @@
 # 创建一个静态库（也可用 SHARED 变动态库）
+file(GLOB_RECURSE FUNCUINT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/FuncUint/*.cpp")
 add_library(RT_Script SHARED
     RT_Script.cpp
     ScriptVariable.cpp
@@ -10,6 +11,7 @@ add_library(RT_Script SHARED
     ScriptUint/ScriptUint_Cmd.cpp
     ScriptUint/ScriptUint_Line.cpp
     ScriptUint/ScriptUint_Buffer.cpp
+    ${FUNCUINT_SOURCES}
 )
 
 # 包含头文件目录（提供给主程序使用）
