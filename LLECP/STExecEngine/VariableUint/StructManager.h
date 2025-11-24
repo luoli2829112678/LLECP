@@ -1,4 +1,6 @@
+#pragma once
 #include"StructInfo.h"
+#define STRINGSIZE 255
 class StructManager
 {
 private:

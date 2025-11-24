@@ -6,6 +6,7 @@ StructManager::StructManager(/* args */)
 
 StructManager::~StructManager()
 {
+    
 }
 int StructManager::AddStruct(string sName,vector<StructInfo>v_StructInfo)
 {
@@ -21,6 +22,7 @@ int StructManager::AddStruct(string sName,vector<StructInfo>v_StructInfo)
         t.v_StructInfoIDList.push_back(v_StructInfo[i].StructInfoID);
     }
     t.StructInfoID = m_StructNum + 1;
+    m_vStructInfo.push_back(t);
 }
 int StructManager::InitStructManager()
 {
@@ -30,6 +32,7 @@ int StructManager::InitStructManager()
     BOOL.StructInfoID = 1;
     BOOL.v_StructInfoIDList.reserve(0);
     m_StructNum ++;
+    m_vStructInfo.push_back(BOOL);
 
     StructInfo INT;
     INT.sStructName = "INT";
@@ -37,6 +40,7 @@ int StructManager::InitStructManager()
     INT.StructInfoID = 2;
     INT.v_StructInfoIDList.reserve(0);
     m_StructNum ++;
+    m_vStructInfo.push_back(INT);
 
     StructInfo DINT;
     DINT.sStructName = "DINT";
@@ -44,6 +48,7 @@ int StructManager::InitStructManager()
     DINT.StructInfoID = 3;
     DINT.v_StructInfoIDList.reserve(0);
     m_StructNum ++;
+    m_vStructInfo.push_back(DINT);
 
     StructInfo REAL;
     REAL.sStructName = "REAL";
@@ -51,6 +56,7 @@ int StructManager::InitStructManager()
     REAL.StructInfoID = 4;
     REAL.v_StructInfoIDList.reserve(0);
     m_StructNum ++;
+    m_vStructInfo.push_back(REAL);
 
     StructInfo LREAL;
     LREAL.sStructName = "LREAL";
@@ -58,6 +64,7 @@ int StructManager::InitStructManager()
     LREAL.StructInfoID = 5;
     LREAL.v_StructInfoIDList.reserve(0);
     m_StructNum ++;
+    m_vStructInfo.push_back(LREAL);
 
     StructInfo LONG;
     LONG.sStructName = "LONG";
@@ -65,7 +72,19 @@ int StructManager::InitStructManager()
     LONG.StructInfoID = 6;
     LONG.v_StructInfoIDList.reserve(0);
     m_StructNum ++;
+    m_vStructInfo.push_back(LONG);
 
+    StructInfo STRING;
+    STRING.sStructName = "STRING";
+    STRING.sStructSize = STRINGSIZE;
+    STRING.StructInfoID = 7;
+    STRING.v_StructInfoIDList.reserve(0);
+    m_StructNum ++;
+    m_vStructInfo.push_back(STRING);
+    
+
+
+    return 0;
 }
 
 

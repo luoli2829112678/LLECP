@@ -60,6 +60,8 @@
         "cinttypes": "cpp",
         "thread": "cpp",
         "soem.h": "c",
-        "osal_defs.h": "c"
+        "osal_defs.h": "c",
+        "semaphore": "cpp",
+        "stop_token": "cpp"
     }
 }
