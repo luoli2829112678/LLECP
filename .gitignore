@@ -1,0 +1,14 @@
+# Build output
+build/
+CMakeCache.txt
+CMakeFiles/
+*.o
+*.a
+*.so
+*.out
+*.bin
+*.log
+
+# IDE
+
+*.user
