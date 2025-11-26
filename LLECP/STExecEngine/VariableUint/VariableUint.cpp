@@ -18,6 +18,7 @@ VariableUint::VariableUint(StructManager* pStructManager,
     }
     else
     {
+        printf("VariableUinterror!\n");
         pDataAddr = nullptr;
     }
 }

@@ -41,17 +41,27 @@ private:
 
 
 private:
-    vector<string> SplitString(string cmd);
-
+    int SplitString(string cmd,vector<string> &v_string);
+    int Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd);
+    //关键字解析
     BaseToken LogicalStatement_Parse(string cmd);
     BaseToken BoolLiteral_Parse(string cmd);
-    //可能为变量或函数或者数组
+
+    //可能为变量或函数或者数组,预处理
     BaseToken Preprocessing_Parse(string cmd);
-    BaseToken VariableType_Parse(string cmd);
-    BaseToken Function_Parse(string cmd);
+    // BaseToken Function_Parse(string cmd);
+
     //双字符判断要在单字符判断前
+    //赋值
     BaseToken Assignment_Parse(string cmd);
-    BaseToken Delimiter_Parse(string cmd);
+    //分隔符，逗号
+    BaseToken Comma_Parse(string cmd);
+    //数字解析
     BaseToken Number_Parse(string cmd);
+    //操作符解析
     BaseToken Operator_Parse(string cmd);
+    //括号
+    BaseToken Delimiter_Parse(string cmd);
+
+    
 };

@@ -22,8 +22,8 @@
 #define SYM_SEMICOLON   ";"
 #define SYM_COLON       ":"
 
-#define SYM_Bracket_L         "["
-#define SYM_Bracket_R         "]"
+#define SYM_Bracket_L         '['
+#define SYM_Bracket_R         ']'
 #define SYM_Braces_L          "{"
 #define SYM_Braces_R          "}"
 #define SYM_COMMA      ","

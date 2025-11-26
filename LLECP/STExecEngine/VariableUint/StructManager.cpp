@@ -8,7 +8,7 @@ StructManager::~StructManager()
 {
     
 }
-int StructManager::AddStruct(string sName,vector<StructInfo>v_StructInfo)
+int StructManager::AddStruct(string sName,vector<StructInfo>v_StructInfo,vector<string>v_StructNameInfo)
 {
     StructInfo t;
     t.sStructName = sName;
@@ -20,17 +20,50 @@ int StructManager::AddStruct(string sName,vector<StructInfo>v_StructInfo)
         offset +=v_StructInfo[i].sStructSize;
         t.sStructSize += v_StructInfo[i].sStructSize;
         t.v_StructInfoIDList.push_back(v_StructInfo[i].StructInfoID);
+        t.sStructName = v_StructNameInfo[i];
     }
     t.StructInfoID = m_StructNum + 1;
     m_vStructInfo.push_back(t);
+    
+    return 0;
 }
+
+int StructManager::GetVariableType(int nBaseType,string sName)
+{
+    
+    return -1;
+}
+
+int StructManager::GetVariableType(string sName)
+{
+    for (size_t i = 0; i < m_vStructInfo.size(); i++)
+    {
+        if(sName == m_vStructInfo[i].sStructName)
+        {
+            return m_vStructInfo[i].StructInfoID;
+        }
+    }
+    printf("GetVariableTypeERROR\n");
+    return -1;
+}
+
 int StructManager::InitStructManager()
 {
+    StructInfo null_;
+    null_.sStructName = "NULL";
+    null_.sStructSize = 0;
+    null_.StructInfoID = 0;
+    null_.v_StructInfoIDList.reserve(0);
+    null_.sStructName.reserve(0);
+    m_StructNum ++;
+    m_vStructInfo.push_back(null_);
+
     StructInfo BOOL;
     BOOL.sStructName = "BOOL";
     BOOL.sStructSize = 1;
     BOOL.StructInfoID = 1;
     BOOL.v_StructInfoIDList.reserve(0);
+    BOOL.sStructName.reserve(0);
     m_StructNum ++;
     m_vStructInfo.push_back(BOOL);
 
@@ -39,6 +72,7 @@ int StructManager::InitStructManager()
     INT.sStructSize = 2;
     INT.StructInfoID = 2;
     INT.v_StructInfoIDList.reserve(0);
+    INT.sStructName.reserve(0);
     m_StructNum ++;
     m_vStructInfo.push_back(INT);
 
@@ -47,6 +81,7 @@ int StructManager::InitStructManager()
     DINT.sStructSize = 4;
     DINT.StructInfoID = 3;
     DINT.v_StructInfoIDList.reserve(0);
+    DINT.sStructName.reserve(0);
     m_StructNum ++;
     m_vStructInfo.push_back(DINT);
 
@@ -55,6 +90,7 @@ int StructManager::InitStructManager()
     REAL.sStructSize = 4;
     REAL.StructInfoID = 4;
     REAL.v_StructInfoIDList.reserve(0);
+    REAL.sStructName.reserve(0);
     m_StructNum ++;
     m_vStructInfo.push_back(REAL);
 
@@ -63,6 +99,7 @@ int StructManager::InitStructManager()
     LREAL.sStructSize = 8;
     LREAL.StructInfoID = 5;
     LREAL.v_StructInfoIDList.reserve(0);
+    LREAL.sStructName.reserve(0);
     m_StructNum ++;
     m_vStructInfo.push_back(LREAL);
 
@@ -71,6 +108,7 @@ int StructManager::InitStructManager()
     LONG.sStructSize = 8;
     LONG.StructInfoID = 6;
     LONG.v_StructInfoIDList.reserve(0);
+    LONG.sStructName.reserve(0);
     m_StructNum ++;
     m_vStructInfo.push_back(LONG);
 
@@ -79,6 +117,7 @@ int StructManager::InitStructManager()
     STRING.sStructSize = STRINGSIZE;
     STRING.StructInfoID = 7;
     STRING.v_StructInfoIDList.reserve(0);
+    STRING.sStructName.reserve(0);
     m_StructNum ++;
     m_vStructInfo.push_back(STRING);
     

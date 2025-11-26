@@ -9,8 +9,10 @@ private:
 public:
     StructManager(/* args */);
     ~StructManager();
-    int AddStruct(string sName,vector<StructInfo>v_StructInfo);
+    int AddStruct(string sName,vector<StructInfo>v_StructInfo,vector<string>v_StructNameInfo);
     int GetStructSize(int32_t nStructInfoID);
+    int GetVariableType(string sName);
+    int GetVariableType(int nBaseType,string sName);
     int InitStructManager();
 };
 

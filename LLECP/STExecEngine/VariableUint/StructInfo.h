@@ -13,7 +13,10 @@ public:
     uint32_t sStructSize;
     //如果该类型为非基本类型，那么这个记录了各个子元素的偏移
     vector<uint32_t>v_AddrOffset;
+    //各个子元素的ID
     vector<uint32_t>v_StructInfoIDList;
+    //各个子元素的标志
+    vector<string>v_StructInfoNameList;
 public:
     StructInfo(/* args */);
     ~StructInfo();

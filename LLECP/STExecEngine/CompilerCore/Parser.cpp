@@ -24,16 +24,119 @@ bool Parser::IsNumber(const char c)
 int Parser::ParserCmd(string sCmd,CmdUint &stCmdUint)
 {
     //分割字符串
-    vector<string> v_scmd = SplitString(sCmd);
-
+    vector<string> v_scmd;
+    SplitString(sCmd,v_scmd);
+    vector<BaseToken> v_tcmd;
+    Str2Token(v_scmd,v_tcmd);
+    stCmdUint.SetCmdUint(v_tcmd);
     return 0;
 }
 
-vector<string> Parser::SplitString(string cmd)
+int Parser::Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd)
 {
-    vector<string> result;
-    size_t i = 0;
+    
+    for (size_t i = 0; i < v_scmd.size(); i++)
+    {
+        BaseToken Token;
+        Token = LogicalStatement_Parse(v_scmd[i]);
+        if(!Token.bInit)
+        Token = BoolLiteral_Parse(v_scmd[i]);
+        if(!Token.bInit)
+        Token = Assignment_Parse(v_scmd[i]);
+        if(!Token.bInit)
+        Token = Comma_Parse(v_scmd[i]);
+        if(!Token.bInit)
+        Token = Number_Parse(v_scmd[i]);
+        if(!Token.bInit)
+        Token = Operator_Parse(v_scmd[i]);
+        if(!Token.bInit)
+        Token = Delimiter_Parse(v_scmd[i]);
+        if(!Token.bInit)
+        //预处理函数或变量
+        Token = Preprocessing_Parse(v_scmd[i]);
+        if(!Token.bInit)
+        {
+            printf("Str2TokenERROR!\n");
+            return -1;
+        }
+        v_tcmd.push_back(Token);
+    }
+    //查找当前push的buffer和全局变量，当前buffer找到则KeywordAddr为值地址，全局变量找到则KeywordAddr的相反数为buffer
+    for (size_t i = 0; i < v_tcmd.size(); i++)
+    {
+        if((TokenType_Preprocessing == v_tcmd[i].enTokenType)&&(i != v_tcmd.size()))
+        {
+            if((v_tcmd[i + 1].enTokenType == TokenType_Delimiter)&& v_tcmd[i + 1].KeywordAddr == DelimiterType_Parentheses_L)
+            //如果下一个是左括号，那么这个就是函数，需要指向函数地址
+            {
+                v_tcmd[i].enTokenType = TokenType_Function;
+                v_tcmd[i].KeywordAddr = m_pFunctionManager->GetFunctionAddr(v_scmd[i]);
+                
+            }
+            else//指向值地址
+            {
+                //结构体变量偏移处理
+                
+                v_tcmd[i].enTokenType = TokenType_Variable;
 
+                //偏移处理，对“.”进行分割  根据偏移可以得到数据类型，因此不需要记录数据类型
+                vector<string> v_sOffset;
+                size_t start = 0;
+                size_t pos = 0;
+
+                while ((pos = v_scmd[i].find('.', start)) != string::npos) 
+                {
+                    v_sOffset.push_back(v_scmd[i].substr(start, pos - start));
+                    start = pos + 1;
+                }
+                v_sOffset.push_back(v_scmd[i].substr(start));
+
+                //数组偏移处理
+                for (size_t j = 0; j < v_sOffset.size(); j++)
+                {
+                    int l = v_sOffset[j].find('[');
+                    int r = v_sOffset[j].find(']');
+                    if((l>0)&&(r>0))
+                    {
+                            size_t l = v_sOffset[j].find('[');
+                            size_t r = v_sOffset[j].find(']');
+                            v_tcmd[i].v_nArrOffset.push_back(stoi(v_sOffset[j].substr(l+1, r-l-1)));
+                            v_sOffset[j] = v_sOffset[j].substr(0, l); 
+                    }
+                    else
+                    {
+                        v_tcmd[i].v_nArrOffset.push_back(0);
+                    }
+                }
+            
+
+
+
+                //拿出值的地址
+                v_tcmd[i].KeywordAddr = m_pVariableManager->GetVariableAddr(v_sOffset[0]);
+                //拿出结构体基础变量类型
+                int baseType =  m_pVariableManager->GetVariableType(v_sOffset[0]);
+                v_tcmd[i].v_nSTOffset.push_back(baseType);
+                //是结构体
+                if(v_sOffset.size()>0)
+                {
+                    //拿出结构体子结构类型
+                    for (size_t j = 1; j < v_sOffset.size(); j++)
+                    {
+                        int type = m_pStructManager->GetVariableType(baseType,v_sOffset[j]);
+                        v_tcmd[i].v_nSTOffset.push_back(type);
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+int Parser::SplitString(string cmd,vector<string> &v_string)
+{
+    v_string.clear();
+    size_t i = 0;
     while (i < cmd.size()) {
 
         // 跳过空格
@@ -48,7 +151,7 @@ vector<string> Parser::SplitString(string cmd)
         for (const auto& sym : symbols) {
             size_t len = sym.size();
             if (i + len <= cmd.size() && cmd.substr(i, len) == sym) {
-                result.push_back(sym);
+                v_string.push_back(sym);
                 i += len;
                 matched = true;
                 break;
@@ -61,32 +164,31 @@ vector<string> Parser::SplitString(string cmd)
         // 如果不是符号，则解析连续的标识符或数字
         if (isalnum(cmd[i]) || cmd[i] == '_') {
             size_t start = i;
-            while (i < cmd.size() && (isalnum(cmd[i]) || cmd[i] == '_'))
+            while (i < cmd.size() && (isalnum(cmd[i]) || cmd[i] == '_'|| cmd[i] == '.'|| cmd[i] == '['|| cmd[i] == ']'))
                 i++;
-            result.push_back(cmd.substr(start, i - start));
+            v_string.push_back(cmd.substr(start, i - start));
         }
         else {
             // 其它未知字符（可以继续扩展）
-            result.push_back(string(1, cmd[i]));
+            v_string.push_back(string(1, cmd[i]));
             i++;
         }
     }
 
     //去除空格与结束符
-    for (size_t i = 0; i < result.size(); i++)
+    for (size_t i = 0; i < v_string.size(); i++)
     {
-        if((SYM_SPACE == result[i]) || (SYM_SEMICOLON == result[i]))
+        if((SYM_SPACE == v_string[i]) || (SYM_SEMICOLON == v_string[i]))
         {
-            result.erase(result.begin() + i);
+            v_string.erase(v_string.begin() + i);
         }
     }
-    
-    return result;
+    return 0;
 }
 
 
 
-BaseToken LogicalStatement_Parse(string cmd)
+BaseToken Parser::LogicalStatement_Parse(string cmd)
 {
     BaseToken T_Token;
     T_Token.KeywordAddr = -1;
@@ -261,7 +363,7 @@ BaseToken Parser::Assignment_Parse(string cmd)
     }
     return T_Token;
 }
-BaseToken Parser::Delimiter_Parse(string cmd)
+BaseToken Parser::Comma_Parse(string cmd)
 {
     //ST分隔符只有逗号
     BaseToken T_Token;
@@ -385,12 +487,54 @@ BaseToken Parser::Operator_Parse(string cmd)
     return T_Token;
 }
 
-BaseToken Parser::VariableType_Parse(string cmd)
+BaseToken Parser::Delimiter_Parse(string cmd)
 {
+    BaseToken T_Token;
+    T_Token.KeywordAddr = -1;
+    T_Token.bInit = true;
+    if(SYM_LPAREN == cmd)
+    {
+        T_Token.enTokenType = TokenType_Delimiter;
+        T_Token.KeywordAddr = DelimiterType_Parentheses_L;
+    } 
+    else if(SYM_RPAREN == cmd)
+    {
+        T_Token.enTokenType = TokenType_Delimiter;
+        T_Token.KeywordAddr = DelimiterType_Parentheses_R;
+    }
+    // else if(SYM_Bracket_L == cmd)
+    // {
+    //     T_Token.enTokenType = TokenType_Delimiter;
+    //     T_Token.KeywordAddr = DelimiterType_Bracket_L;
+    // }
+    // else if(SYM_Bracket_R == cmd)
+    // {
+    //     T_Token.enTokenType = TokenType_Delimiter;
+    //     T_Token.KeywordAddr = DelimiterType_Bracket_R;
+    // }
 
+    else if(SYM_Braces_L == cmd)
+    {
+        T_Token.enTokenType = TokenType_Delimiter;
+        T_Token.KeywordAddr = DelimiterType_Braces_L;
+    }
+    else if(SYM_Braces_R == cmd)
+    {
+        T_Token.enTokenType = TokenType_Delimiter;
+        T_Token.KeywordAddr = DelimiterType_Braces_R;
+    }
+    else
+    {
+        T_Token.bInit = false;
+    }
+    return T_Token;
 }
+// BaseToken Parser::VariableType_Parse(string cmd)
+// {
 
-BaseToken Parser::Function_Parse(string cmd)
-{
+// }
 
-}
+// BaseToken Parser::Function_Parse(string cmd)
+// {
+
+// }

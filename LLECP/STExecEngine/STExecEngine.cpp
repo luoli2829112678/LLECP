@@ -1,6 +1,10 @@
 #include"STExecEngine.h"
 STExecEngine::STExecEngine(/* args */)
+    : m_StructManager()              
+    , m_VariableManager(&m_StructManager)  
 {
+
+    m_nPushBufferID = -1;
     m_pParser = new Parser(&m_VariableManager,&m_StructManager,&m_FunctionManager);
     m_pActuator = new Actuator(&m_VariableManager,&m_StructManager,&m_FunctionManager);
 }
@@ -20,6 +24,8 @@ int STExecEngine::STEE_EnableBuffer(uint16_t nBufferID,bool bEnable)
 
 int STExecEngine::STEE_StartPushBuffer()
 {
+    m_nPushBufferID ++;
+    m_VariableManager.SetPushBufferID(m_nPushBufferID);
     return m_ProgramManager.StartPushBuffer();
 }
 

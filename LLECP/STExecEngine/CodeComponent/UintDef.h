@@ -35,7 +35,7 @@ enum EN_TokenType {
     TokenType_NULL,//空
     TokenType_INTNumber,//整数数字
     TokenType_DOUBLENumber,//小数字
-    TokenType_COMMA,//字符
+    TokenType_COMMA,//分隔符字符
     TokenType_BoolLiteral,//TRUE  过渡，转换成数字
     TokenType_Operator,//操作运算符+-
     TokenType_Delimiter,//括号
@@ -73,7 +73,5 @@ enum EN_DelimiterType {
     DelimiterType_Bracket_R,//[
     DelimiterType_Braces_L,//{
     DelimiterType_Braces_R,//}
-    DelimiterType_BracketA_L,//[
-    DelimiterType_BracketA_R,//[
     DelimiterType_ERROR
 };

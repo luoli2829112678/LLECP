@@ -16,6 +16,10 @@ public:
     //如果是数字，那么这个就是数字值，因此为64位
     //......
     double KeywordAddr;
+    //结构体偏移
+    std::vector<int16_t>v_nSTOffset;
+    //数组偏移
+    std::vector<int16_t>v_nArrOffset;
 public:
     BaseToken(/* args */);
     ~BaseToken();

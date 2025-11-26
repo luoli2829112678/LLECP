@@ -8,8 +8,8 @@ class VariableUint
 public:
 
     string sVariableName;
-    uint32_t nVariableSize;
-    uint32_t nStructInfoID;
+    int32_t nVariableSize;
+    int32_t nStructInfoID;
     void* pDataAddr;
 public:
     VariableUint() = default;

@@ -19,6 +19,8 @@ public:
     Parser* m_pParser;
     //执行器
     Actuator* m_pActuator;
+    //
+    int m_nPushBufferID;
 public:
     STExecEngine(/* args */);
     ~STExecEngine();
