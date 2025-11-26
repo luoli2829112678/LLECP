@@ -15,6 +15,7 @@
 #include"SMbasic_stdafx.h"
 #include"RT_Script.h"
 #include"EtherCATMaster.h"
+#define EtherCAT_NetworkPort "enp3s0"
 
 #define SM_Test main
 
@@ -64,6 +65,7 @@ int SM_Test()
     double pos = 0;
     v_Axis.clear();
     EtherCATMaster* pMaster = new EtherCATMaster(0);  
+    pMaster->SetNetworkPort(EtherCAT_NetworkPort);
     pMaster->StartMaster();//启动主站
     pMaster->ConstructionCIA402AxisVec(&v_Axis);//主站从从站获取生成轴
     pSoftMotion = new SoftMotion(v_Axis);//使用轴初始化softmotion
@@ -102,7 +104,7 @@ int SM_Test()
     pos = v_Axis[0]->dActPosition;
     while (true)
     {
-        pos = pos - 0.0005;
+        pos = pos + 0.001;
         printf("RunPos:%.6f\n",pos);
         fbFollowPosition(v_Axis[0],true,pos,bBusy,bError,nErrorID);
         pSoftMotion->SoftMotionRun();

@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC -g  -shared -Wl,-soname,libmotion_algorithm.so -o /usr/bin/LLETC/libmotion_algorithm.so CMakeFiles/motion_algorithm.dir/motion_planning/motion_planning.cpp.o   -L/opt/etherlab/lib 

@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC -g  -shared -Wl,-soname,libCIA402Axis.so -o /usr/bin/LLETC/libCIA402Axis.so CMakeFiles/CIA402Axis.dir/CIA402Axis.cpp.o CMakeFiles/CIA402Axis.dir/CIA402AxisPDO.cpp.o CMakeFiles/CIA402Axis.dir/CIA402AxisConfig.cpp.o CMakeFiles/CIA402Axis.dir/CIA402AxisGeneral.cpp.o   -L/opt/etherlab/lib 

@@ -120,7 +120,7 @@ int VariableManager::GetVariableAddr(string str)
 int VariableManager::GetVariableType(string str)
 {
     auto it = m_BufferVariable[m_nPushbuffID].find(str);
-    if(nullptr == it)
+    if(m_BufferVariable[m_nPushbuffID].end() == it)
     {
         printf("GetVariableTypeERROR\n");
         return -1;

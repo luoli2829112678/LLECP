@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/LLECP/LLECP/STExecEngine/CompilerCore/VariableManager.cpp
+VariableManager.h
+/home/LLECP/LLECP/STExecEngine/CompilerCore/VariableManager.h
+
+/home/LLECP/LLECP/STExecEngine/CompilerCore/VariableManager.h
+../VariableUint/VariableUint.h
+/home/LLECP/LLECP/STExecEngine/VariableUint/VariableUint.h
+unordered_map
+-
+
+/home/LLECP/LLECP/STExecEngine/VariableUint/StructInfo.h
+string
+-
+vector
+-
+
+/home/LLECP/LLECP/STExecEngine/VariableUint/StructManager.h
+StructInfo.h
+/home/LLECP/LLECP/STExecEngine/VariableUint/StructInfo.h
+
+/home/LLECP/LLECP/STExecEngine/VariableUint/VariableUint.h
+StructManager.h
+/home/LLECP/LLECP/STExecEngine/VariableUint/StructManager.h
+cstdlib
+-
+cstring
+-
+

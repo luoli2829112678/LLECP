@@ -59,6 +59,7 @@ protected:
 public:
     EtherCATMaster(uint8_t nMasterIndex);
     ~EtherCATMaster();
+    int SetNetworkPort(std::string networkport);
     int StartMaster();
     int CloseMaster();
     void Test();

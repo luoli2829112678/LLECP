@@ -59,6 +59,11 @@ int EtherCATMaster::StartMaster()
     InitSlave();
     return 0;
 }
+int EtherCATMaster::SetNetworkPort(std::string networkport)
+{
+   m_sNetWork = networkport;
+   return 0;
+}
 int EtherCATMaster::CloseMaster()
 {
    /* stop SOEM, close socket */

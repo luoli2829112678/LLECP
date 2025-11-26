@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/LLECP/LLECP/LLSMC/SoftMotion/motion_algorithm/motion_planning/MotionDefine.h
+stdio.h
+-
+stdint.h
+-
+vector
+-
+algorithm
+-
+iostream
+-
+fstream
+-
+math.h
+-
+
+/home/LLECP/LLECP/LLSMC/SoftMotion/motion_algorithm/motion_planning/motion_planning.cpp
+motion_planning.h
+/home/LLECP/LLECP/LLSMC/SoftMotion/motion_algorithm/motion_planning/motion_planning.h
+
+/home/LLECP/LLECP/LLSMC/SoftMotion/motion_algorithm/motion_planning/motion_planning.h
+MotionDefine.h
+/home/LLECP/LLECP/LLSMC/SoftMotion/motion_algorithm/motion_planning/MotionDefine.h
+stdio.h
+-
+stdlib.h
+-
+math.h
+-
+

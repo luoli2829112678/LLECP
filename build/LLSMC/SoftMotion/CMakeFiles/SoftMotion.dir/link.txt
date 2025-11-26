@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC -g  -shared -Wl,-soname,libSoftMotion.so -o /usr/bin/LLETC/libSoftMotion.so CMakeFiles/SoftMotion.dir/SoftMotion.cpp.o CMakeFiles/SoftMotion.dir/SoftMotionPlanner.cpp.o   -L/opt/etherlab/lib  -Wl,-rpath,/opt/etherlab/lib:/usr/bin/LLETC /usr/bin/LLETC/libmotion_algorithm.so /usr/bin/LLETC/libCIA402Axis.so 
