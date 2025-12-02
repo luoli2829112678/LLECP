@@ -21,8 +21,9 @@ bool Parser::IsNumber(const char c)
     return (c >= '0' && c <= '9') || (c == '.');
 }
 
-int Parser::ParserCmd(string sCmd,CmdUint &stCmdUint)
+int Parser::ParserCmd(int PushBuffID,string sCmd,CmdUint &stCmdUint)
 {
+    m_PushBuffID = PushBuffID;
     //分割字符串
     vector<string> v_scmd;
     SplitString(sCmd,v_scmd);
@@ -38,11 +39,14 @@ int Parser::Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd)
     for (size_t i = 0; i < v_scmd.size(); i++)
     {
         BaseToken Token;
+        Token.nBuffID  = m_PushBuffID;
         Token = LogicalStatement_Parse(v_scmd[i]);
         if(!Token.bInit)
         Token = BoolLiteral_Parse(v_scmd[i]);
         if(!Token.bInit)
         Token = Assignment_Parse(v_scmd[i]);
+        if(!Token.bInit)
+        Token = VariableType_Parse(v_scmd[i]);
         if(!Token.bInit)
         Token = Comma_Parse(v_scmd[i]);
         if(!Token.bInit)
@@ -114,6 +118,7 @@ int Parser::Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd)
 
                 //拿出值的地址
                 v_tcmd[i].KeywordAddr = m_pVariableManager->GetVariableAddr(v_sOffset[0]);
+                
                 //拿出结构体基础变量类型
                 int baseType =  m_pVariableManager->GetVariableType(v_sOffset[0]);
                 v_tcmd[i].v_nSTOffset.push_back(baseType);
@@ -522,6 +527,24 @@ BaseToken Parser::Delimiter_Parse(string cmd)
     {
         T_Token.enTokenType = TokenType_Delimiter;
         T_Token.KeywordAddr = DelimiterType_Braces_R;
+    }
+    else
+    {
+        T_Token.bInit = false;
+    }
+    return T_Token;
+}
+
+BaseToken Parser::VariableType_Parse(string cmd)
+{
+    BaseToken T_Token;
+    T_Token.KeywordAddr = -1;
+    T_Token.bInit = true;
+    int nTypeID = m_pStructManager->GetVariableType(cmd);
+    if(nTypeID >=0)
+    {
+        T_Token.enTokenType = TokenType_VariableType;
+        T_Token.KeywordAddr = nTypeID;
     }
     else
     {

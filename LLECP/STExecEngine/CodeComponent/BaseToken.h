@@ -16,6 +16,7 @@ public:
     //如果是数字，那么这个就是数字值，因此为64位
     //......
     double KeywordAddr;
+    uint8_t nBuffID;
     //结构体偏移
     std::vector<int16_t>v_nSTOffset;
     //数组偏移

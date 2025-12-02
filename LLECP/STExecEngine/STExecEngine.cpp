@@ -37,7 +37,7 @@ int STExecEngine::STEE_StartPushLine()
 int STExecEngine::STEE_PushCmd(string scmd)
 {
     CmdUint T_CmdUint;
-    int res =  m_pParser->ParserCmd(scmd,T_CmdUint);
+    int res =  m_pParser->ParserCmd(m_nPushBufferID,scmd,T_CmdUint);
     if(0 == res)
     {
         m_ProgramManager.PushCmd(T_CmdUint);

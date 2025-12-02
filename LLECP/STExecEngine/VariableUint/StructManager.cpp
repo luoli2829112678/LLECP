@@ -30,7 +30,11 @@ int StructManager::AddStruct(string sName,vector<StructInfo>v_StructInfo,vector<
 
 int StructManager::GetVariableType(int nBaseType,string sName)
 {
-    
+    for (size_t i = 0; i < m_vStructInfo[nBaseType].v_StructInfoNameList.size(); i++)
+    {
+        if(m_vStructInfo[nBaseType].v_StructInfoNameList[i] == sName)
+            return m_vStructInfo[nBaseType].v_StructInfoIDList[i];
+    }
     return -1;
 }
 

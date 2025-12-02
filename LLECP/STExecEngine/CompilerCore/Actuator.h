@@ -12,7 +12,11 @@ private:
     VariableManager* m_pVariableManager;
     //函数管理器
     FunctionManager* m_pFunctionManager;
+
+    BaseToken GetVariable(BaseToken inputToken);
+
 public:
     Actuator(VariableManager* pVariableManager,StructManager* pStructManager,FunctionManager* pFunctionManager);
+    int ExecuteCommand(CmdUint* pCmdUint);
     ~Actuator();
 };

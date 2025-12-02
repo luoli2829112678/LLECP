@@ -34,12 +34,14 @@ int VariableManager::AddVariable(int buffID, const VariableUint& variable)
     if (buffID < 0)
     {
         // 全局变量
-        auto result = m_GlobalVariable.emplace(name, variable); // 调用 VariableUint 的拷贝构造
-        if (!result.second)
+        for (size_t i = 0; i < m_GlobalVariable.size(); i++)
         {
-            // 已经存在同名变量
-            return -1;
+            if(m_GlobalVariable[i].sVariableName == variable.sVariableName)
+                // 已经存在同名变量
+                return -1;
         }
+        
+        m_GlobalVariable.push_back( variable); // 调用 VariableUint 的拷贝构造
     }
     else
     {
@@ -48,14 +50,14 @@ int VariableManager::AddVariable(int buffID, const VariableUint& variable)
         {
             return -2; // buffID 越界
         }
-
-        auto& bufMap = m_BufferVariable[buffID];
-        auto result = bufMap.emplace(name, variable); // 同样是拷贝构造
-        if (!result.second)
+        for (size_t i = 0; i < m_BufferVariable[buffID].size(); i++)
         {
-            // 已经存在同名变量
-            return -1;
+            if(m_BufferVariable[buffID][i].sVariableName == variable.sVariableName)
+                // 已经存在同名变量
+                return -1;
         }
+        auto& bufMap = m_BufferVariable[buffID];
+        bufMap.push_back(variable); // 同样是拷贝构造
     }
 
     return 0; // 成功
@@ -67,12 +69,12 @@ VariableUint* VariableManager::FindVariable(int buffID, const std::string& name)
     if (buffID < 0)
     {
         // 查全局变量
-        auto it = m_GlobalVariable.find(name);
-        if (it == m_GlobalVariable.end())
+        for (size_t i = 0; i < m_GlobalVariable.size(); i++)
         {
-            return nullptr;
+            if(m_GlobalVariable[i].sVariableName == name)
+                return &m_GlobalVariable[i];
         }
-        return &it->second;
+        return &m_GlobalVariable[0];
     }
     else
     {
@@ -80,14 +82,24 @@ VariableUint* VariableManager::FindVariable(int buffID, const std::string& name)
         {
             return nullptr; // 越界，直接视为没找到
         }
-
-        auto& bufMap = m_BufferVariable[buffID];
-        auto it = bufMap.find(name);
-        if (it == bufMap.end())
+        for (size_t i = 0; i < m_BufferVariable[buffID].size(); i++)
         {
-            return nullptr;
+            if(m_BufferVariable[buffID][i].sVariableName == name)
+                return &m_BufferVariable[buffID][i];
         }
-        return &it->second;
+        return &m_GlobalVariable[0];
+    }
+}
+VariableUint* VariableManager::GetVariable(int buffID, int nAddr)
+{
+    auto it = m_GlobalVariable.begin();
+    if(buffID < 0)
+    {
+        buffID = 0 - buffID;
+        for (size_t i = 0; i < buffID; i++)
+        {
+            it++;
+        }
     }
 }
 
@@ -99,7 +111,7 @@ int VariableManager::GetVariableAddr(string str)
     //优先查找buffer变量
     for (auto it = bufMap.begin(); it != bufMap.end(); ++it, ++index)
     {
-        if (it->first == str)
+        if (it->sVariableName == str)
         {
             return index;   // 返回在这个 buffer 里的“第几个”
         }
@@ -107,7 +119,7 @@ int VariableManager::GetVariableAddr(string str)
     //查找全局变量
     for (auto it = m_GlobalVariable.begin(); it != m_GlobalVariable.end(); ++it, ++index)
     {
-        if (it->first == str)
+        if (it->sVariableName == str)
         {
             return -index;   // 返回在这个 buffer 里的“第几个”
         }
@@ -119,11 +131,11 @@ int VariableManager::GetVariableAddr(string str)
 
 int VariableManager::GetVariableType(string str)
 {
-    auto it = m_BufferVariable[m_nPushbuffID].find(str);
-    if(m_BufferVariable[m_nPushbuffID].end() == it)
+    for (size_t i = 0; i < m_BufferVariable[m_nPushbuffID].size(); i++)
     {
-        printf("GetVariableTypeERROR\n");
-        return -1;
+        if(m_BufferVariable[m_nPushbuffID][i].sVariableName == str)
+            return m_BufferVariable[m_nPushbuffID][i].nStructInfoID;
     }
-    return it->second.nStructInfoID;
+    printf("GetVariableTypeERROR\n");
+    return -1;
 }

@@ -7,12 +7,13 @@ private:
     int m_nPushbuffID;
     StructManager* m_pStructManager;
     //var hash map
-    std::unordered_map<std::string, VariableUint> m_GlobalVariable;
-    std::unordered_map<std::string, VariableUint> m_BufferVariable[64];
+    vector<VariableUint> m_GlobalVariable;
+    vector<VariableUint> m_BufferVariable[64];
 public:
     int SetPushBufferID(int ID);
     int AddVariable(int buffID, const VariableUint& variable);
     VariableUint* FindVariable(int buffID, const std::string& name);
+    VariableUint* GetVariable(int buffID, int nAddr);
     int GetVariableAddr(string str);
     
     int GetVariableType(string str);

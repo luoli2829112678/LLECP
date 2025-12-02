@@ -1,5 +1,5 @@
 file(GLOB_RECURSE CompilerCore_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/*.cpp")
-file(GLOB_RECURSE GrammarUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/GrammarUint/*.cpp")
+file(GLOB_RECURSE FunctionUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/FunctionUint/*.cpp")
 file(GLOB_RECURSE VariableUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/VariableUint/*.cpp")
 file(GLOB_RECURSE CodeComponent_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CodeComponent/*.cpp")
 
@@ -8,7 +8,7 @@ file(GLOB_RECURSE CodeComponent_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CodeCompone
 add_library(STExecEngine SHARED
     STExecEngine.cpp
     ${CompilerCore_SOURCES}
-    ${GrammarUint_SOURCES}
+    ${FunctionUint_SOURCES}
     ${VariableUint_SOURCES}
     ${CodeComponent_SOURCES}
 )

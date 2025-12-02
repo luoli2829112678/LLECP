@@ -16,10 +16,12 @@ private:
     VariableManager* m_pVariableManager;
     //函数管理器
     FunctionManager* m_pFunctionManager;
+    //当前的bufferID
+    int m_PushBuffID;
 public:
     Parser(VariableManager* pVariableManager,StructManager* pStructManager,FunctionManager* pFunctionManager);
     ~Parser();
-    int ParserCmd(string sCmd,CmdUint &stCmdUint);
+    int ParserCmd(int PushBuffID,string sCmd,CmdUint &stCmdUint);
 
 
 private:
@@ -62,6 +64,8 @@ private:
     BaseToken Operator_Parse(string cmd);
     //括号
     BaseToken Delimiter_Parse(string cmd);
+    //数据类型解析
+    BaseToken VariableType_Parse(string cmd);
 
     
 };
