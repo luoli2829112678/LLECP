@@ -1,5 +1,6 @@
 #include"VariableUint/StructManager.h"
-#include"CompilerCore/Parser.h"
+#include"CompilerCore/EvalVisitor.h"
+#include"CompilerCore/ParserManager.h"
 #include"CompilerCore/Actuator.h"
 #include"CompilerCore/VariableManager.h"
 #include"CompilerCore/FunctionManager.h"
@@ -16,7 +17,7 @@ public:
     //程序管理器
     ProgramManager m_ProgramManager;
     //解析器
-    Parser* m_pParser;
+    ParserManager* m_pParserManager;
     //执行器
     Actuator* m_pActuator;
     //

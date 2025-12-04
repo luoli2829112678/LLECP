@@ -11,12 +11,12 @@
 
 #include "ANTLR/generated/STGrammarLexer.h"
 #include "ANTLR/generated/STGrammarParser.h"
-class Parser
+class ParserManager
 {
 private:
     /* data */
 public:
-    Parser(/* args */);
-    ~Parser();
+    ParserManager(/* args */);
+    ~ParserManager();
 };
 

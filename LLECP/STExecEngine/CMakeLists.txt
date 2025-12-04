@@ -20,7 +20,8 @@ message(STATUS "ANTLR4 result = ${ANTLR_RESULT}")
 message(STATUS "ANTLR4 stdout = ${ANTLR_OUT}")
 message(STATUS "ANTLR4 stderr = ${ANTLR_ERR}")
 
-
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
 file(GLOB_RECURSE CompilerCore_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/*.cpp")
 file(GLOB_RECURSE FunctionUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/FunctionUint/*.cpp")
@@ -71,4 +72,5 @@ target_include_directories(STExecEngine
 
 target_link_libraries(STExecEngine
     antlr4-runtime
+    Threads::Threads
 )

@@ -5,7 +5,7 @@ STExecEngine::STExecEngine(/* args */)
 {
 
     m_nPushBufferID = -1;
-    m_pParser = new Parser();
+    m_pParserManager = new ParserManager();
     m_pActuator = new Actuator(&m_VariableManager,&m_StructManager,&m_FunctionManager);
 }
 
