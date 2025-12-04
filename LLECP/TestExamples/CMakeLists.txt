@@ -12,5 +12,6 @@ foreach(EXAMPLE
     SoftMotion
     motion_algorithm
     STExecEngine
+    antlr4-runtime
     )
 endforeach()

@@ -61,14 +61,14 @@ target_include_directories(STExecEngine PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}          # 这里也要加
 )
 
-# 包含头文件目录（提供给主程序使用）
-target_include_directories(STExecEngine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/include/antlr4-runtime
+target_include_directories(STExecEngine
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}                             # STExecEngine 自己的头
+        ${CMAKE_CURRENT_SOURCE_DIR}/FunctionUint
+        ${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/generated
+        ${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/include/antlr4-runtime
 )
 
-
-# 链接 ANTLR4 runtime 库
 target_link_libraries(STExecEngine
     antlr4-runtime
 )
