@@ -5,7 +5,7 @@ STExecEngine::STExecEngine(/* args */)
 {
 
     m_nPushBufferID = -1;
-    m_pParser = new Parser(&m_VariableManager,&m_StructManager,&m_FunctionManager);
+    m_pParser = new Parser();
     m_pActuator = new Actuator(&m_VariableManager,&m_StructManager,&m_FunctionManager);
 }
 
@@ -36,11 +36,5 @@ int STExecEngine::STEE_StartPushLine()
 
 int STExecEngine::STEE_PushCmd(string scmd)
 {
-    CmdUint T_CmdUint;
-    int res =  m_pParser->ParserCmd(m_nPushBufferID,scmd,T_CmdUint);
-    if(0 == res)
-    {
-        m_ProgramManager.PushCmd(T_CmdUint);
-    }
-    return res;
+    return 0;
 }

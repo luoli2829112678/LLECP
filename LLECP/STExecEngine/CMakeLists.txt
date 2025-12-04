@@ -2,11 +2,11 @@ file(GLOB_RECURSE CompilerCore_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore
 file(GLOB_RECURSE FunctionUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/FunctionUint/*.cpp")
 file(GLOB_RECURSE VariableUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/VariableUint/*.cpp")
 file(GLOB_RECURSE CodeComponent_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CodeComponent/*.cpp")
-
-
+file(GLOB_RECURSE ANTLR_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/*.cpp")
 
 add_library(STExecEngine SHARED
     STExecEngine.cpp
+    ${ANTLR_SOURCES}
     ${CompilerCore_SOURCES}
     ${FunctionUint_SOURCES}
     ${VariableUint_SOURCES}
@@ -39,3 +39,15 @@ target_include_directories(STExecEngine PUBLIC
 
 # 包含头文件目录（提供给主程序使用）
 target_include_directories(STExecEngine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/install/include/antlr4-runtime
+)
+
+link_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/install/lib
+)
+
+# 链接 ANTLR4 runtime 库
+target_link_libraries(STExecEngine
+    antlr4-runtime
+)
