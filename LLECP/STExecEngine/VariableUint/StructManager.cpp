@@ -65,7 +65,7 @@ int StructManager::InitStructManager()
     StructInfo BOOL;
     BOOL.sStructName = "BOOL";
     BOOL.sStructSize = 1;
-    BOOL.StructInfoID = 1;
+    BOOL.StructInfoID = STRUCT_INFO_NULL;
     BOOL.v_StructInfoIDList.reserve(0);
     BOOL.sStructName.reserve(0);
     m_StructNum ++;
@@ -74,7 +74,7 @@ int StructManager::InitStructManager()
     StructInfo INT;
     INT.sStructName = "INT";
     INT.sStructSize = 2;
-    INT.StructInfoID = 2;
+    INT.StructInfoID = STRUCT_INFO_INT;
     INT.v_StructInfoIDList.reserve(0);
     INT.sStructName.reserve(0);
     m_StructNum ++;
@@ -83,7 +83,7 @@ int StructManager::InitStructManager()
     StructInfo DINT;
     DINT.sStructName = "DINT";
     DINT.sStructSize = 4;
-    DINT.StructInfoID = 3;
+    DINT.StructInfoID = STRUCT_INFO_DINT;
     DINT.v_StructInfoIDList.reserve(0);
     DINT.sStructName.reserve(0);
     m_StructNum ++;
@@ -92,7 +92,7 @@ int StructManager::InitStructManager()
     StructInfo REAL;
     REAL.sStructName = "REAL";
     REAL.sStructSize = 4;
-    REAL.StructInfoID = 4;
+    REAL.StructInfoID = STRUCT_INFO_REAL;
     REAL.v_StructInfoIDList.reserve(0);
     REAL.sStructName.reserve(0);
     m_StructNum ++;
@@ -101,7 +101,7 @@ int StructManager::InitStructManager()
     StructInfo LREAL;
     LREAL.sStructName = "LREAL";
     LREAL.sStructSize = 8;
-    LREAL.StructInfoID = 5;
+    LREAL.StructInfoID = STRUCT_INFO_LREAL;
     LREAL.v_StructInfoIDList.reserve(0);
     LREAL.sStructName.reserve(0);
     m_StructNum ++;
@@ -110,14 +110,14 @@ int StructManager::InitStructManager()
     StructInfo LONG;
     LONG.sStructName = "LONG";
     LONG.sStructSize = 8;
-    LONG.StructInfoID = 6;
+    LONG.StructInfoID = STRUCT_INFO_LONG;
     LONG.v_StructInfoIDList.reserve(0);
     LONG.sStructName.reserve(0);
     m_StructNum ++;
     m_vStructInfo.push_back(LONG);
 
     StructInfo STRING;
-    STRING.sStructName = "STRING";
+    STRING.sStructName = STRUCT_INFO_STRING;
     STRING.sStructSize = STRINGSIZE;
     STRING.StructInfoID = 7;
     STRING.v_StructInfoIDList.reserve(0);

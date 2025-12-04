@@ -23,6 +23,44 @@ VariableUint::VariableUint(StructManager* pStructManager,
     }
 }
 
+//  移动构造：偷指针 + 清空源
+VariableUint::VariableUint(VariableUint&& other) 
+{
+    sVariableName = std::move(other.sVariableName);
+    nVariableSize = other.nVariableSize;
+    nStructInfoID = other.nStructInfoID;
+    pDataAddr     = other.pDataAddr;
+
+    // 把源对象清空，防止析构时二次释放
+    other.nVariableSize = 0;
+    other.nStructInfoID = -1;
+    other.pDataAddr     = nullptr;
+}
+
+//  移动赋值：释放自己 → 偷指针 → 清空源
+VariableUint& VariableUint::operator=(VariableUint&& other) 
+{
+    if (this != &other)
+    {
+        // 先释放自己原有资源
+        if (pDataAddr)
+        {
+            std::free(pDataAddr);
+            pDataAddr = nullptr;
+        }
+
+        sVariableName = std::move(other.sVariableName);
+        nVariableSize = other.nVariableSize;
+        nStructInfoID = other.nStructInfoID;
+        pDataAddr     = other.pDataAddr;
+
+        other.nVariableSize = 0;
+        other.nStructInfoID = -1;
+        other.pDataAddr     = nullptr;
+    }
+    return *this;
+}
+
 //  深拷贝构造
 VariableUint::VariableUint(const VariableUint& other)
 {

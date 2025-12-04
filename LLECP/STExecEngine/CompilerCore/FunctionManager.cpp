@@ -2,6 +2,8 @@
 
 FunctionManager::FunctionManager(/* args */)
 {
+    Function_HRPC functionHRPC;
+    m_vFunctionInfo.push_back(functionHRPC);
 }
 
 FunctionManager::~FunctionManager()
@@ -28,4 +30,8 @@ int FunctionManager::AddFunctionInfo(FunctionInfo functionInfo)
 {
     m_vFunctionInfo.push_back(functionInfo);
     return 0;
+}
+FunctionInfo FunctionManager::GetFunction(int nAddr)
+{
+    return m_vFunctionInfo[nAddr];
 }

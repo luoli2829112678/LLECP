@@ -8,18 +8,16 @@ using namespace std;
 
 class FunctionInfo
 {
-private:
+protected:
     string m_sFunctionName;
     map<string, int> mmFunctionInput;
-    map<string, int> mmFunctionOutput;
-    LineUint m_FunctionBody;
+    VariableUint Result;
+    int virtual Execution();
 public:
-    FunctionInfo( string sFunctionName,
-                  map<string, int> mFunctionInput,
-                  map<string, int> mFunctionOutput
-                  );
-    int InitFunctionBody(LineUint functionBody);
+    FunctionInfo();
+    VariableUint CallFunc(vector<VariableUint>Input);
     int GetFunctionName(string& sFunctionName);
+
     ~FunctionInfo();
 };
 

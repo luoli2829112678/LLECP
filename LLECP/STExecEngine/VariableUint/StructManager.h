@@ -16,3 +16,11 @@ public:
     int InitStructManager();
 };
 
+#define STRUCT_INFO_NULL 0
+#define STRUCT_INFO_BOOL 1
+#define STRUCT_INFO_INT 2
+#define STRUCT_INFO_DINT 3 
+#define STRUCT_INFO_REAL 4
+#define STRUCT_INFO_LREAL 5
+#define STRUCT_INFO_LONG 6 
+#define STRUCT_INFO_STRING 7

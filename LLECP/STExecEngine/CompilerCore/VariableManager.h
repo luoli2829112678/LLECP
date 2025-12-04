@@ -1,5 +1,6 @@
 #pragma once
 #include"../VariableUint/VariableUint.h"
+#include"./CodeComponent/BufferUint.h"
 #include <unordered_map>
 class VariableManager
 {
@@ -21,3 +22,5 @@ public:
     VariableManager(StructManager* m_pStructManager);
     ~VariableManager();
 };
+BaseToken VariableUint2BaseToken(VariableUint var);
+VariableUint BaseToken2VariableUint(BaseToken token);

@@ -101,6 +101,16 @@ VariableUint* VariableManager::GetVariable(int buffID, int nAddr)
             it++;
         }
     }
+    else
+    {
+        auto &bufMap = m_BufferVariable[buffID];
+        it = bufMap.begin();
+        for (size_t i = 0; i < nAddr; i++)
+        {
+            it++;
+        }
+    }
+    return &(*it);
 }
 
 int VariableManager::GetVariableAddr(string str)
@@ -138,4 +148,75 @@ int VariableManager::GetVariableType(string str)
     }
     printf("GetVariableTypeERROR\n");
     return -1;
+}
+
+
+
+BaseToken VariableUint2BaseToken(VariableUint var)
+{
+    BaseToken token;
+    token.bInit = true;
+    switch (var.nStructInfoID)
+    {
+    case STRUCT_INFO_NULL:
+        token.enTokenType = TokenType_NULL;
+        token.KeywordAddr = 0;
+        break;
+    case STRUCT_INFO_INT:
+        token.enTokenType = TokenType_INTNumber;
+        token.KeywordAddr = *(int16_t*)var.pDataAddr;
+        break;
+    case STRUCT_INFO_DINT:
+        token.enTokenType = TokenType_INTNumber;    
+        token.KeywordAddr = *(int32_t*)var.pDataAddr;
+        break;
+    case STRUCT_INFO_REAL:
+        token.enTokenType = TokenType_DOUBLENumber;
+        token.KeywordAddr = *(float*)var.pDataAddr;
+        break;
+    case STRUCT_INFO_LREAL:
+        token.enTokenType = TokenType_DOUBLENumber;
+        token.KeywordAddr = *(double*)var.pDataAddr;
+        break;
+    case STRUCT_INFO_BOOL:
+        token.enTokenType = TokenType_INTNumber;
+        token.KeywordAddr = (*(bool*)var.pDataAddr)?1:0;
+        break;  
+    case STRUCT_INFO_LONG:
+        token.enTokenType = TokenType_INTNumber;
+        token.KeywordAddr = *(long*)var.pDataAddr;
+        break;  
+    default:
+        break;
+    }
+    return token;
+}
+VariableUint BaseToken2VariableUint(BaseToken token)
+{
+    VariableUint var;
+    switch (token.enTokenType)
+    {
+    case TokenType_INTNumber:
+        {
+            int32_t val = static_cast<int32_t>(token.KeywordAddr);
+            VariableUint var;
+            var.nStructInfoID = STRUCT_INFO_DINT;
+            var.nVariableSize = sizeof(int32_t);
+            var.pDataAddr = new int32_t(val);
+        }
+        break;
+    case TokenType_DOUBLENumber:
+        {
+            double val = token.KeywordAddr;
+            VariableUint var;
+            var.nStructInfoID = STRUCT_INFO_LREAL;
+            var.nVariableSize = sizeof(double);
+            var.pDataAddr = new double(val);
+        }
+        break;
+    default:
+        printf("BaseToken2VariableUintERROR:Unsupported variable type!\n");
+        break;
+    }
+    return var;
 }

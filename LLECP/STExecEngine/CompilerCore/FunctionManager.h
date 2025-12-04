@@ -1,6 +1,6 @@
 #pragma once
 #include<string>
-#include"../FunctionUint/FunctionInfo.h"
+#include"../FunctionUint/FunctionInclude.h"
 using namespace std;
 class FunctionManager
 {
@@ -9,6 +9,7 @@ private:
 public:
     int GetFunctionAddr(string sCmd);
     int AddFunctionInfo(FunctionInfo functionInfo);
+    FunctionInfo GetFunction(int nAddr);
     FunctionManager(/* args */);
     ~FunctionManager();
 };

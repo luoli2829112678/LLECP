@@ -24,8 +24,8 @@ public:
     VariableUint& operator=(const VariableUint& other);
 
     // 禁止移动（防止“只搬指针”的语义混进来）
-    VariableUint(VariableUint&& other) noexcept = delete;
-    VariableUint& operator=(VariableUint&& other) noexcept = delete;
+    VariableUint(VariableUint&& other);
+    VariableUint& operator=(VariableUint&& other);
 
     ~VariableUint();
 };

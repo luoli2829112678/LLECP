@@ -552,12 +552,7 @@ BaseToken Parser::VariableType_Parse(string cmd)
     }
     return T_Token;
 }
-// BaseToken Parser::VariableType_Parse(string cmd)
-// {
-
-// }
-
-// BaseToken Parser::Function_Parse(string cmd)
-// {
-
-// }
+int Parser::InitCmd(BufferUint* pBuffer)
+{
+    return 0;
+}

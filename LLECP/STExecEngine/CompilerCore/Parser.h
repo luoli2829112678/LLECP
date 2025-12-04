@@ -45,6 +45,8 @@ private:
 private:
     int SplitString(string cmd,vector<string> &v_string);
     int Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd);
+    //初始化buffer，if，while等的初始化
+    int InitCmd(BufferUint* pBuffer);
     //关键字解析
     BaseToken LogicalStatement_Parse(string cmd);
     BaseToken BoolLiteral_Parse(string cmd);

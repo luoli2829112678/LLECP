@@ -17,6 +17,7 @@ private:
 
 public:
     Actuator(VariableManager* pVariableManager,StructManager* pStructManager,FunctionManager* pFunctionManager);
-    int ExecuteCommand(CmdUint* pCmdUint);
+    int ExecuteLine(LineUint* pLineUint);
+    BaseToken ExecuteCommand(CmdUint* pCmdUint);
     ~Actuator();
 };

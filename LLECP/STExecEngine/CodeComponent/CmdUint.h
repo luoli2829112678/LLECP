@@ -12,6 +12,11 @@ private:
     std::vector<VariableUint>m_vParam;
     bool m_bIsCmdInit = false;
     bool m_bCmdRunDone=false;
+
+    //执行后是否跳转
+
+    //执行后跳转目标位置
+    
 public:
     CmdUint();
     //push阶段

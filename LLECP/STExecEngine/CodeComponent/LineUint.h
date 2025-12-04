@@ -3,7 +3,7 @@
 #include"CmdUint.h"
 class LineUint
 {
-private:
+public:
     uint32_t nCmdNum_Now;
     uint32_t nCmdRunIndex;
     bool bLineRunDone = false;
