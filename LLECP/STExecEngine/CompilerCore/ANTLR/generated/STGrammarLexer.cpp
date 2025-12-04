@@ -1,5 +1,5 @@
 
-// Generated from STGrammar.g4 by ANTLR 4.13.1
+// Generated from /home/LLECP/LLECP/STExecEngine/CompilerCore/ANTLR/STGrammar.g4 by ANTLR 4.13.2
 
 
 #include "STGrammarLexer.h"
@@ -45,7 +45,7 @@ struct STGrammarLexerStaticData final {
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
 static thread_local
 #endif
-STGrammarLexerStaticData *stgrammarlexerLexerStaticData = nullptr;
+std::unique_ptr<STGrammarLexerStaticData> stgrammarlexerLexerStaticData = nullptr;
 
 void stgrammarlexerLexerInitialize() {
 #if ANTLR4_USE_THREAD_LOCAL_CACHE
@@ -349,7 +349,7 @@ void stgrammarlexerLexerInitialize() {
   for (size_t i = 0; i < count; i++) { 
     staticData->decisionToDFA.emplace_back(staticData->atn->getDecisionState(i), i);
   }
-  stgrammarlexerLexerStaticData = staticData.release();
+  stgrammarlexerLexerStaticData = std::move(staticData);
 }
 
 }

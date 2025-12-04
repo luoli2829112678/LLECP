@@ -1,8 +1,32 @@
+set(CMAKE_CXX_STANDARD 17)
+set(GRAMMAR_FILE   ${CMAKE_SOURCE_DIR}/STExecEngine/CompilerCore/ANTLR/STGrammar.g4)
+set(GENERATED_DIR  ${CMAKE_SOURCE_DIR}/STExecEngine/CompilerCore/ANTLR/generated)
+
+file(MAKE_DIRECTORY ${GENERATED_DIR})
+
+execute_process(
+    COMMAND antlr4
+            -Dlanguage=Cpp
+            -visitor
+            -o ${GENERATED_DIR}
+            ${GRAMMAR_FILE}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/STExecEngine/CompilerCore/ANTLR
+    RESULT_VARIABLE ANTLR_RESULT
+    OUTPUT_VARIABLE ANTLR_OUT
+    ERROR_VARIABLE  ANTLR_ERR
+)
+
+message(STATUS "ANTLR4 result = ${ANTLR_RESULT}")
+message(STATUS "ANTLR4 stdout = ${ANTLR_OUT}")
+message(STATUS "ANTLR4 stderr = ${ANTLR_ERR}")
+
+
+
 file(GLOB_RECURSE CompilerCore_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/*.cpp")
 file(GLOB_RECURSE FunctionUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/FunctionUint/*.cpp")
 file(GLOB_RECURSE VariableUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/VariableUint/*.cpp")
 file(GLOB_RECURSE CodeComponent_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CodeComponent/*.cpp")
-file(GLOB_RECURSE ANTLR_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/*.cpp")
+file(GLOB_RECURSE ANTLR_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/generated/*.cpp")
 
 add_library(STExecEngine SHARED
     STExecEngine.cpp
@@ -40,12 +64,9 @@ target_include_directories(STExecEngine PUBLIC
 # 包含头文件目录（提供给主程序使用）
 target_include_directories(STExecEngine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/install/include/antlr4-runtime
+    ${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/include/antlr4-runtime
 )
 
-link_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/ANTLR/install/lib
-)
 
 # 链接 ANTLR4 runtime 库
 target_link_libraries(STExecEngine

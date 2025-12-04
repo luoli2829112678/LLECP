@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
+set(CMAKE_CXX_STANDARD 17)
 project(LLECP CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY /usr/bin/LLETC)  # 可执行文件（.out / 无扩展名）
