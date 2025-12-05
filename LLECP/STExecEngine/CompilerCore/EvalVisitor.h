@@ -46,10 +46,9 @@ public:
     antlrcpp::Any visitTwo_para_function(STGrammarParser::Two_para_functionContext *ctx) override;
     antlrcpp::Any visitRead_set_function(STGrammarParser::Read_set_functionContext *ctx) override;
 
-private:
     // 小工具：把 Any 转成 Value，统一处理
     Value asValue(const antlrcpp::Any &any);
-
+private:
     // 一些内部帮助函数
     Value callOneParaFunction(const std::string &name, const Value &arg);
     Value callTwoParaFunction(const std::string &name, const Value &arg1, const Value &arg2);
