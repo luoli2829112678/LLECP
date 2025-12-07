@@ -1,4 +1,11 @@
 #include"VariableUint.h"
+VariableUint::VariableUint()
+{
+    sVariableName = "null";
+    nVariableSize = 0;
+    nStructInfoID = -1;
+    pDataAddr     = nullptr;
+}
 // 普通构造：根据类型ID向 StructManager 要大小，然后 malloc
 VariableUint::VariableUint(StructManager* pStructManager,
                            uint32_t structInfoID,

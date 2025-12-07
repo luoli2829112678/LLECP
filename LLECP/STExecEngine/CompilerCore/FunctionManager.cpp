@@ -2,8 +2,8 @@
 
 FunctionManager::FunctionManager(/* args */)
 {
-    Function_HRPC functionHRPC;
-    m_vFunctionInfo.push_back(functionHRPC);
+    //Function_HRPC functionHRPC;
+    m_vFunctionInfo.push_back(Function_HRPC());
 }
 
 FunctionManager::~FunctionManager()

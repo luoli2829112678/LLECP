@@ -12,7 +12,7 @@ public:
     int32_t nStructInfoID;
     void* pDataAddr;
 public:
-    VariableUint() = default;
+    VariableUint();
 
     // 带类型 + 名字构造
     VariableUint(StructManager* pStructManager,

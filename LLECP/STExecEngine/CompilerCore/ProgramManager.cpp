@@ -49,3 +49,8 @@ int ProgramManager::PushCmd(CmdUint Cmd)
 {
     return m_BufferUint[m_PushBufferID].PushCmd(m_PushLineID,Cmd);
 }
+int ProgramManager::InitBuffer(BufferUint* pBufferUint)
+{
+
+    return 0;
+}

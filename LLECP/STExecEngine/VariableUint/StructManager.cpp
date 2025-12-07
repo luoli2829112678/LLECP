@@ -65,7 +65,7 @@ int StructManager::InitStructManager()
     StructInfo BOOL;
     BOOL.sStructName = "BOOL";
     BOOL.sStructSize = 1;
-    BOOL.StructInfoID = STRUCT_INFO_NULL;
+    BOOL.StructInfoID = STRUCT_INFO_BOOL;
     BOOL.v_StructInfoIDList.reserve(0);
     BOOL.sStructName.reserve(0);
     m_StructNum ++;

@@ -17,6 +17,8 @@ public:
     int StartPushBuffer();
     int StartPushLine();
     int PushCmd(CmdUint sCmd);
+    //初始化buffer
+    int InitBuffer(BufferUint* pBufferUint);
 };
 
 
