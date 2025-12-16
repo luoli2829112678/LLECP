@@ -47,7 +47,7 @@ int StructManager::GetVariableType(string sName)
             return m_vStructInfo[i].StructInfoID;
         }
     }
-    printf("GetVariableTypeERROR\n");
+    //printf("GetVariableTypeERROR\n");
     return -1;
 }
 

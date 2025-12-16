@@ -32,7 +32,7 @@
             "name": "调试 EtherCATMasterExamples",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/TestExamples/EtherCATMasterExamples",  // ✅ 你构建出来的目标路径
+            "program": "/usr/bin/LLETC/EtherCATMasterExamples",  // ✅ 你构建出来的目标路径
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -52,7 +52,7 @@
             "name": "调试 RT_ScriptExamples",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/TestExamples/RT_ScriptExamples",  // ✅ 你构建出来的目标路径
+            "program": "/usr/bin/LLETC/RT_ScriptExamples",  // ✅ 你构建出来的目标路径
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -112,7 +112,7 @@
             "name": "调试 LLSMCExamples",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/TestExamples/MotionPlanningExamples",  // ✅ 你构建出来的目标路径
+            "program": "/usr/bin/LLETC/MotionPlanningExamples",  // ✅ 你构建出来的目标路径
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

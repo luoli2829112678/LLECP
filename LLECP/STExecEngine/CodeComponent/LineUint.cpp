@@ -2,6 +2,9 @@
 
 LineUint::LineUint(/* args */)
 {
+    nCmdNum_Now = 0;
+    nCmdRunIndex = 0;
+    bLineRunDone = false;
 }
 
 LineUint::~LineUint()

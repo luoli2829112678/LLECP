@@ -36,47 +36,60 @@ int Actuator::ExecuteLine(LineUint* pLineUint)
 
 BaseToken Actuator::ExecuteCommand(CmdUint* pCmdUint)
 {
+    pCmdUint->SetCmdRunDone(false);
     BaseToken result;
-    auto TokenList = pCmdUint->GetToken();
+    std::vector<BaseToken> * TokenList = pCmdUint->GetToken();
+    //第零优先级变量声明
+
     //第一优先级变量转换
-    for (size_t i = 0; i < TokenList.size(); i++)
+    for (size_t i = 0; i < TokenList->size(); i++)
     {
-        if(TokenType_Variable == TokenList[i].enTokenType)
+        //赋值前的变量不做转换
+        if((TokenType_Variable == (*TokenList)[i].enTokenType)&&(TokenType_Assignment != (*TokenList)[i+1].enTokenType))
         {
-            TokenList[i] = GetVariable(TokenList[i]);
+            (*TokenList)[i] = GetVariable((*TokenList)[i]);
+        }
+    }
+    //正负号处理
+    for (size_t i = 0; i < TokenList->size(); i++)
+    {
+        if((TokenType_Direction == (*TokenList)[i].enTokenType))
+        {
+            //符号乘以数字
+            (*TokenList)[i+1].KeywordAddr = (int)(*TokenList)[i].KeywordAddr * (*TokenList)[i+1].KeywordAddr;
         }
     }
     
     //第二优先级执行函数
-    for (size_t i = 0; i < TokenList.size(); i++)
+    for (size_t i = 0; i < TokenList->size(); i++)
     {
-        if(TokenType_Function == TokenList[i].enTokenType)
+        if(TokenType_Function == (*TokenList)[i].enTokenType)
         {
-            FunctionInfo fun = m_pFunctionManager->GetFunction(TokenList[i].KeywordAddr);
+            FunctionInfo fun = m_pFunctionManager->GetFunction((*TokenList)[i].KeywordAddr);
             //遍历
             //层数
-            int nHierarchy = -1;
+            int nHierarchy = 0;
             int nFunEnd = -1;
             vector<CmdUint> subCmd;
             vector<BaseToken> subToken;
-            for (size_t j = i+1; i < TokenList.size(); j++)
+            for (size_t j = i+1; i < TokenList->size(); j++)
             {
-                if((nHierarchy == 0)&&(TokenList[j].KeywordAddr == DelimiterType_Parentheses_R))
+                if((nHierarchy == 0)&&((*TokenList)[j].KeywordAddr == DelimiterType_Parentheses_R))
                 {
                     nFunEnd = j;
                     break;
                 }
-                if(TokenList[j].KeywordAddr == DelimiterType_Parentheses_L)
+                if((*TokenList)[j].KeywordAddr == DelimiterType_Parentheses_L)
                 {
                     nHierarchy++;
                     continue;
                 }
-                if(TokenList[j].KeywordAddr == DelimiterType_Parentheses_R)
+                if((*TokenList)[j].KeywordAddr == DelimiterType_Parentheses_R)
                 {
                     nHierarchy--;
                     continue;
                 }
-                if(TokenList[j].KeywordAddr == TokenType_COMMA)
+                if((*TokenList)[j].KeywordAddr == TokenType_COMMA)
                 {
                     CmdUint tcmd;
                     tcmd.SetCmdUint(subToken);
@@ -84,7 +97,7 @@ BaseToken Actuator::ExecuteCommand(CmdUint* pCmdUint)
                     subToken.clear();
                     continue;
                 }
-                subToken.push_back(TokenList[j]);
+                subToken.push_back((*TokenList)[j]);
             }
             vector <BaseToken> paramToken;
             //回调计算值
@@ -102,22 +115,85 @@ BaseToken Actuator::ExecuteCommand(CmdUint* pCmdUint)
             VariableUint ResultVar = fun.CallFunc(InputVar);
             BaseToken Funout = VariableUint2BaseToken(ResultVar);
             //删除函数并使用Funout替代
-            TokenList.erase(TokenList.begin() + i,TokenList.begin() + nFunEnd + 1);
-            TokenList.insert(TokenList.begin() + i,Funout);
+            TokenList->erase(TokenList->begin() + i,TokenList->begin() + nFunEnd + 1);
+            TokenList->insert(TokenList->begin() + i,Funout);
         }
     }
     //第三优先级执行逻辑语句
-    for (size_t i = 0; i < TokenList.size(); i++)
+    for (size_t i = 0; i < TokenList->size(); i++)
     {
-        if(TokenType_LogicalStatement == TokenList[i].enTokenType)
+        if(TokenType_LogicalStatement == (*TokenList)[i].enTokenType)
         {
-            //逻辑语句处理
+            ST_Result res = ExecuteLogicalStatement(pCmdUint);
+            if(res.bResetCmd)
+            {
+                pCmdUint->ResetCmd();
+            }
         }
     }
-    //第四优先级执行计算（调用计算器）
 
+    // 第四优先级执行计算（调用计算器）
+    int firstOpIndex = -1;
+    int lastOpIndex  = -1;
+    // 1查找第一个 & 最后一个运算符的位置
+    if (TokenList && !TokenList->empty())
+    {
+        for (int i = 0; i < (int)TokenList->size(); ++i)
+        {
+            if ((*TokenList)[i].enTokenType == TokenType_Operator)
+            {
+                if (firstOpIndex == -1)
+                    firstOpIndex = i;   // 第一次遇到，记录第一个位置
+
+                lastOpIndex = i;        // 一直更新，最后一次就是最后位置
+            }
+        }
+    }
+    // 2️计算并替换这一段 token
+    if (firstOpIndex != -1 && lastOpIndex >= firstOpIndex)
+    {
+        // ① 取出要计算的这段表达式（这里是从第一个运算符到最后一个运算符）
+        std::vector<BaseToken> vExpr(
+            TokenList->begin() + firstOpIndex,
+            TokenList->begin() + lastOpIndex + 1   // 注意 +1，end 是开区间
+        );
+
+        // 丢进计算器
+        BaseToken resultToken = Calculator(vExpr);
+
+        // 用计算结果替换掉原来的那一串 token
+        TokenList->erase(
+            TokenList->begin() + firstOpIndex,
+            TokenList->begin() + lastOpIndex + 1
+        );
+        TokenList->insert(
+            TokenList->begin() + firstOpIndex,
+            resultToken
+        );
+    }
+    
     //第五优先级执行赋值
-
+    for (size_t i = 0; i < TokenList->size(); i++)
+    {
+        if(TokenType_Assignment == (*TokenList)[i].enTokenType)
+        {
+            if((*TokenList).size()!=3)
+            {
+                printf("ExecuteCommandERROR:Assignment format error!\n");
+                break;
+            }
+            if(TokenType_Variable != (*TokenList)[i-1].enTokenType)
+            {
+                printf("ExecuteCommandERROR:Left side of Assignment is not variable!\n");
+                break;
+            }
+            VariableUint Var = BaseToken2VariableUint((*TokenList)[i+1]);
+            m_pVariableManager->SetVariable((*TokenList)[i-1].nBuffID,(*TokenList)[i-1].KeywordAddr,Var);
+            ST_Result stResult;
+            stResult.bIsNextLine = true;
+            pCmdUint->SetResult(stResult);
+        }
+    }
     return result;
 }
 

@@ -52,4 +52,5 @@ int SMbasic::SetFBStatus(bool bBusy,bool bDone,bool bCommandAborted,bool bError,
     m_bCommandAborted = bCommandAborted;
     m_bError = bError;
     m_nErrorID = nErrorID;
+    return SMEC_SUCCESSED;
 }

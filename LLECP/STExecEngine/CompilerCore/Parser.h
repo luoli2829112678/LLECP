@@ -7,6 +7,14 @@
 #include"VariableManager.h"
 #include"../VariableUint/StructManager.h"
 #include"../CodeComponent/BufferUint.h"
+
+enum EN_ParserResult
+{
+    enParserFail = -1,
+    enParserSuccess = 0,
+    enVariableDeclaration = 1,
+};
+
 class Parser
 {
 private:

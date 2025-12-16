@@ -8,10 +8,21 @@ int main()
     STExecEngine_inst.STEE_PushCmd("INT X;");
     STExecEngine_inst.STEE_PushCmd("INT Y;");
     STExecEngine_inst.STEE_PushCmd("INT Z;");
-    STExecEngine_inst.STEE_PushCmd("INT A;");
+    STExecEngine_inst.STEE_PushCmd("LREAL A;");
     STExecEngine_inst.STEE_PushCmd("INT B;");
     STExecEngine_inst.STEE_PushCmd("INT C;");
-    STExecEngine_inst.STEE_PushCmd("s:=b+REX(x.y[1].z,1*1.3)");
+    VariableUint* pvar = STExecEngine_inst.m_VariableManager.GetVariable(0,"A");
+    STExecEngine_inst.STEE_PushCmd("A:=10.5;");
+    STExecEngine_inst.STEE_PushCmd("B:=20;");
+    STExecEngine_inst.STEE_PushCmd("C:=A+B");
+    STExecEngine_inst.InitProgramManager();
+    double* pA = (double*)pvar->pDataAddr;
+    printf("A:%f\n",*pA);
+    while(true)
+    {
+        STExecEngine_inst.ExecuteProgram();
+        printf("A:%f\n",*pA);
+    }
     printf("1111111\n");
     return 0;
 }

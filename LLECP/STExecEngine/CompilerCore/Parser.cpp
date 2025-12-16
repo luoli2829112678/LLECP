@@ -28,9 +28,14 @@ int Parser::ParserCmd(int PushBuffID,string sCmd,CmdUint &stCmdUint)
     vector<string> v_scmd;
     SplitString(sCmd,v_scmd);
     vector<BaseToken> v_tcmd;
-    Str2Token(v_scmd,v_tcmd);
+    int res  = Str2Token(v_scmd,v_tcmd);
+    if(enVariableDeclaration == res)
+    {
+        //变量声明，直接返回
+        return enVariableDeclaration;
+    }
     stCmdUint.SetCmdUint(v_tcmd);
-    return 0;
+    return enParserSuccess;
 }
 
 int Parser::Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd)
@@ -44,9 +49,16 @@ int Parser::Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd)
         if(!Token.bInit)
         Token = BoolLiteral_Parse(v_scmd[i]);
         if(!Token.bInit)
-        Token = Assignment_Parse(v_scmd[i]);
-        if(!Token.bInit)
         Token = VariableType_Parse(v_scmd[i]);
+        if(Token.bInit)
+        {
+            //添加变量到变量管理器中
+            int addr = m_pVariableManager->AddVariable(m_PushBuffID,VariableUint(m_pStructManager,(int)Token.KeywordAddr,v_scmd[i + 1])); 
+            //变量声明直接返回
+            return enVariableDeclaration;
+        }
+        if(!Token.bInit)
+        Token = Assignment_Parse(v_scmd[i]);
         if(!Token.bInit)
         Token = Comma_Parse(v_scmd[i]);
         if(!Token.bInit)
@@ -61,13 +73,15 @@ int Parser::Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd)
         if(!Token.bInit)
         {
             printf("Str2TokenERROR!\n");
-            return -1;
+            return enParserFail;
         }
         v_tcmd.push_back(Token);
     }
     //查找当前push的buffer和全局变量，当前buffer找到则KeywordAddr为值地址，全局变量找到则KeywordAddr的相反数为buffer
     for (size_t i = 0; i < v_tcmd.size(); i++)
     {
+        //初始化buffid
+        v_tcmd[i].nBuffID = m_PushBuffID;
         if((TokenType_Preprocessing == v_tcmd[i].enTokenType)&&(i != v_tcmd.size()))
         {
             if((v_tcmd[i + 1].enTokenType == TokenType_Delimiter)&& v_tcmd[i + 1].KeywordAddr == DelimiterType_Parentheses_L)
@@ -113,9 +127,6 @@ int Parser::Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd)
                     }
                 }
             
-
-
-
                 //拿出值的地址
                 v_tcmd[i].KeywordAddr = m_pVariableManager->GetVariableAddr(v_sOffset[0]);
                 
@@ -135,7 +146,7 @@ int Parser::Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd)
             }
         }
     }
-    return 0;
+    return enParserSuccess;
 }
 
 int Parser::SplitString(string cmd,vector<string> &v_string)
@@ -417,7 +428,7 @@ BaseToken Parser::Number_Parse(string cmd)
     if (!hasDigit)
         return T_Token;
     T_Token.bInit = true;
-    if(hasDigit)
+    if(hasDot)
     {
         T_Token.enTokenType = TokenType_DOUBLENumber;
         T_Token.KeywordAddr = stod(cmd);;
@@ -552,6 +563,7 @@ BaseToken Parser::VariableType_Parse(string cmd)
     }
     return T_Token;
 }
+
 int Parser::InitCmd(BufferUint* pBuffer)
 {
     return 0;

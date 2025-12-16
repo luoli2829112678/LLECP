@@ -1,4 +1,52 @@
 #pragma once
+#include <stdint.h>
+//联合体参数
+union UN_TransitionParam {
+    int nParam;
+    double dParam;
+    long lnParam;
+    long long llParam2;
+};
+struct ST_Result
+{
+    //是否跳转
+    bool bIsJump;
+    //跳转位置
+    uint32_t nJumpLinePos;
+    uint32_t nJumpCmdPos;
+    //是否执行下一行
+    bool bIsNextLine;
+    bool bResetCmd;
+    ST_Result()
+    {
+        bIsJump = false;
+        nJumpLinePos = 0;
+        nJumpCmdPos = 0;
+        bIsNextLine = true;
+        bResetCmd = false;
+    }
+};
+
+
+enum EN_CmdType
+{
+    CmdType_NULL,
+    //赋值
+    CmdType_Assignment,
+    //变量声明
+    CmdType_VariableDeclaration,
+    //IF
+    CmdType_IF,
+    CmdType_ELSEIF,
+    CmdType_ELSE,
+    CmdType_ENDIF,
+    //WHILE
+    CmdType_WHILE,
+    CmdType_ENDWHILE,
+    //LOOP
+    CmdType_LOOP,
+    CmdType_ENDLOOP,
+};
 
 
 enum EN_LogicalStatementType

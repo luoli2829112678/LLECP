@@ -2,8 +2,8 @@
 #include"LineUint.h"
 class BufferUint
 {
-private:
-
+    
+public:
     uint32_t m_nLineRunIndex;
 
     bool m_bBufferRunDone=false;
@@ -15,9 +15,13 @@ public:
 
 
     int EnableBuffer(bool bEnable);
-    bool IsEnable();
     int CleanBuffer();
     int StartPushLine();
     int PushCmd(uint16_t nLineID,CmdUint cmd);
+
+    //小蝌蚪找妈妈
+    int InitBuffer();
+    int InitCmdType();
+    int StatementMatching();
 };
 

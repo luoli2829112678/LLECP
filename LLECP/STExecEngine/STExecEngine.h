@@ -21,6 +21,7 @@ public:
     Actuator* m_pActuator;
     //
     int m_nPushBufferID;
+    
 public:
     STExecEngine(/* args */);
     ~STExecEngine();
@@ -32,4 +33,9 @@ public:
     int STEE_StartPushLine();
     //push指令
     int STEE_PushCmd(string scmd);
+    //push完成后的初始化
+    int InitProgramManager();
+
+    //执行程序
+    int ExecuteProgram();
 };

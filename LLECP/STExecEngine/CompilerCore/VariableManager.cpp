@@ -112,6 +112,31 @@ VariableUint* VariableManager::GetVariable(int buffID, int nAddr)
     }
     return &(*it);
 }
+VariableUint* VariableManager::GetVariable(int buffID, string str)
+{
+    if(buffID >= 0)
+    {
+        auto &bufMap = m_BufferVariable[buffID];
+        //优先查找buffer变量
+        for (auto it = bufMap.begin(); it != bufMap.end(); ++it)
+        {
+            if (it->sVariableName == str)
+            {
+                return &(*it);
+            }
+        }
+    }
+    //查找全局变量
+    for (auto it = m_GlobalVariable.begin(); it != m_GlobalVariable.end(); ++it)
+    {
+        if (it->sVariableName == str)
+        {
+            return &(*it);
+        }
+    }
+    printf("GetVariableError\n");
+    return nullptr;  // 没找到
+}
 
 int VariableManager::GetVariableAddr(string str)
 {
@@ -136,6 +161,20 @@ int VariableManager::GetVariableAddr(string str)
     }
     printf("GetVariableAddrError\n");
     return 0;  // 没找到
+}
+
+int VariableManager::SetVariable(int buffID, uint32_t addr,VariableUint variable)
+{
+    if(buffID < 0)
+    {
+        buffID = 0 - buffID;
+        m_GlobalVariable[addr] = variable;
+    }
+    else
+    {
+        m_BufferVariable[buffID][addr] = variable;
+    }
+    return 0;
 }
 
 
@@ -199,7 +238,6 @@ VariableUint BaseToken2VariableUint(BaseToken token)
     case TokenType_INTNumber:
         {
             int32_t val = static_cast<int32_t>(token.KeywordAddr);
-            VariableUint var;
             var.nStructInfoID = STRUCT_INFO_DINT;
             var.nVariableSize = sizeof(int32_t);
             var.pDataAddr = new int32_t(val);
@@ -208,7 +246,6 @@ VariableUint BaseToken2VariableUint(BaseToken token)
     case TokenType_DOUBLENumber:
         {
             double val = token.KeywordAddr;
-            VariableUint var;
             var.nStructInfoID = STRUCT_INFO_LREAL;
             var.nVariableSize = sizeof(double);
             var.pDataAddr = new double(val);

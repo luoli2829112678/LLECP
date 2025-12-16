@@ -1,7 +1,6 @@
 #pragma once
-#include"FunctionManager.h"
-#include"VariableManager.h"
-#include"../VariableUint/StructManager.h"
+#include"Calculator.h"
+
 
 class Actuator
 {
@@ -14,6 +13,7 @@ private:
     FunctionManager* m_pFunctionManager;
 
     BaseToken GetVariable(BaseToken inputToken);
+    ST_Result ExecuteLogicalStatement(CmdUint* pCmdUint);
 
 public:
     Actuator(VariableManager* pVariableManager,StructManager* pStructManager,FunctionManager* pFunctionManager);

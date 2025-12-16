@@ -2,6 +2,7 @@
 
 ProgramManager::ProgramManager(/* args */)
 {
+    m_bProgramRunDone = false;
     m_PushLineID = -1;
     m_PushBufferID = -1;
 }
@@ -49,8 +50,9 @@ int ProgramManager::PushCmd(CmdUint Cmd)
 {
     return m_BufferUint[m_PushBufferID].PushCmd(m_PushLineID,Cmd);
 }
-int ProgramManager::InitBuffer(BufferUint* pBufferUint)
-{
 
-    return 0;
+int ProgramManager::InitBuffer(int nBufferID)
+{
+    return m_BufferUint[nBufferID].InitBuffer();
 }
+
