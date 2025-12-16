@@ -1,6 +1,8 @@
 #include"StructManager.h"
 StructManager::StructManager(/* args */)
 {
+    m_StructNum = 0;
+    m_vStructInfo.clear();
     InitStructManager();
 }
 

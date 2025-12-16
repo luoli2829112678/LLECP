@@ -44,11 +44,18 @@ int Parser::Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd)
     for (size_t i = 0; i < v_scmd.size(); i++)
     {
         BaseToken Token;
-        Token.nBuffID  = m_PushBuffID;
         Token = LogicalStatement_Parse(v_scmd[i]);
-        if(!Token.bInit)
+        if(Token.bInit)
+        {
+            v_tcmd.push_back(Token);
+            continue;
+        }
         Token = BoolLiteral_Parse(v_scmd[i]);
-        if(!Token.bInit)
+        if(Token.bInit)
+        {
+            v_tcmd.push_back(Token);
+            continue;
+        }
         Token = VariableType_Parse(v_scmd[i]);
         if(Token.bInit)
         {
@@ -57,17 +64,41 @@ int Parser::Str2Token(vector<string> v_scmd,vector<BaseToken> &v_tcmd)
             //变量声明直接返回
             return enVariableDeclaration;
         }
-        if(!Token.bInit)
+        if(Token.bInit)
+        {
+            v_tcmd.push_back(Token);
+            continue;
+        }
         Token = Assignment_Parse(v_scmd[i]);
-        if(!Token.bInit)
+        if(Token.bInit)
+        {
+            v_tcmd.push_back(Token);
+            continue;
+        }
         Token = Comma_Parse(v_scmd[i]);
-        if(!Token.bInit)
+        if(Token.bInit)
+        {
+            v_tcmd.push_back(Token);
+            continue;
+        }
         Token = Number_Parse(v_scmd[i]);
-        if(!Token.bInit)
+        if(Token.bInit)
+        {
+            v_tcmd.push_back(Token);
+            continue;
+        }
         Token = Operator_Parse(v_scmd[i]);
-        if(!Token.bInit)
+        if(Token.bInit)
+        {
+            v_tcmd.push_back(Token);
+            continue;
+        }
         Token = Delimiter_Parse(v_scmd[i]);
-        if(!Token.bInit)
+        if(Token.bInit)
+        {
+            v_tcmd.push_back(Token);
+            continue;
+        }
         //预处理函数或变量
         Token = Preprocessing_Parse(v_scmd[i]);
         if(!Token.bInit)

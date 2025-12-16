@@ -11,34 +11,33 @@ Actuator::~Actuator()
 {
 }
 
-int Actuator::ExecuteLine(LineUint* pLineUint)
+int Actuator::ExecuteLine(LineUint pLineUint)
 {
-    for (;pLineUint->nCmdRunIndex < pLineUint->m_vCmd.size();)
+    for (;pLineUint.nCmdRunIndex < pLineUint.m_vCmd.size();)
     {
-        ExecuteCommand(&pLineUint->m_vCmd[pLineUint->nCmdRunIndex]);
-        if(pLineUint->m_vCmd[pLineUint->nCmdRunIndex].IsCmdRunDone())
+        ExecuteCommand(pLineUint.m_vCmd[pLineUint.nCmdRunIndex]);
+        if(pLineUint.m_vCmd[pLineUint.nCmdRunIndex].GetResult().bIsNextCmd)
         {
-            pLineUint->nCmdRunIndex++;
+            pLineUint.nCmdRunIndex++;
         }
         else
         {
             break;
         }
     }
-    if(pLineUint->nCmdRunIndex >= pLineUint->m_vCmd.size())
+    if(pLineUint.nCmdRunIndex >= pLineUint.m_vCmd.size())
     {
-        pLineUint->bLineRunDone = true;
+        pLineUint.bLineRunDone = true;
     }
     return 0;
 }
 
 
 
-BaseToken Actuator::ExecuteCommand(CmdUint* pCmdUint)
+BaseToken Actuator::ExecuteCommand(CmdUint& CmdUintIn)
 {
-    pCmdUint->SetCmdRunDone(false);
     BaseToken result;
-    std::vector<BaseToken> * TokenList = pCmdUint->GetToken();
+    std::vector<BaseToken> * TokenList = CmdUintIn.GetToken();
     //第零优先级变量声明
 
     //第一优先级变量转换
@@ -91,9 +90,7 @@ BaseToken Actuator::ExecuteCommand(CmdUint* pCmdUint)
                 }
                 if((*TokenList)[j].KeywordAddr == TokenType_COMMA)
                 {
-                    CmdUint tcmd;
-                    tcmd.SetCmdUint(subToken);
-                    subCmd.push_back(tcmd);
+
                     subToken.clear();
                     continue;
                 }
@@ -103,7 +100,7 @@ BaseToken Actuator::ExecuteCommand(CmdUint* pCmdUint)
             //回调计算值
             for (size_t j = 0; j < subCmd.size(); j++)
             {
-                paramToken.push_back(ExecuteCommand(&subCmd[j]));
+                paramToken.push_back(ExecuteCommand(subCmd[j]));
             }
             //准备输入输出变量
             vector<VariableUint> InputVar;
@@ -124,11 +121,15 @@ BaseToken Actuator::ExecuteCommand(CmdUint* pCmdUint)
     {
         if(TokenType_LogicalStatement == (*TokenList)[i].enTokenType)
         {
-            ST_Result res = ExecuteLogicalStatement(pCmdUint);
+            ST_Result res = ExecuteLogicalStatement(CmdUintIn);
             if(res.bResetCmd)
             {
-                pCmdUint->ResetCmd();
+                CmdUintIn.ResetCmd();
             }
+            //返回跳转
+            CmdUintIn.SetResult(res);
+            //逻辑指令后不支持其他指令，直接return
+            return BaseToken();
         }
     }
 
@@ -154,8 +155,8 @@ BaseToken Actuator::ExecuteCommand(CmdUint* pCmdUint)
     {
         // ① 取出要计算的这段表达式（这里是从第一个运算符到最后一个运算符）
         std::vector<BaseToken> vExpr(
-            TokenList->begin() + firstOpIndex,
-            TokenList->begin() + lastOpIndex + 1   // 注意 +1，end 是开区间
+            TokenList->begin() + firstOpIndex - 1,
+            TokenList->begin() + lastOpIndex + 2   // 注意 +1，end 是开区间
         );
 
         // 丢进计算器
@@ -163,11 +164,11 @@ BaseToken Actuator::ExecuteCommand(CmdUint* pCmdUint)
 
         // 用计算结果替换掉原来的那一串 token
         TokenList->erase(
-            TokenList->begin() + firstOpIndex,
-            TokenList->begin() + lastOpIndex + 1
+            TokenList->begin() + firstOpIndex -1,
+            TokenList->begin() + lastOpIndex + 2
         );
         TokenList->insert(
-            TokenList->begin() + firstOpIndex,
+            TokenList->begin() + firstOpIndex -1,
             resultToken
         );
     }
@@ -190,8 +191,8 @@ BaseToken Actuator::ExecuteCommand(CmdUint* pCmdUint)
             VariableUint Var = BaseToken2VariableUint((*TokenList)[i+1]);
             m_pVariableManager->SetVariable((*TokenList)[i-1].nBuffID,(*TokenList)[i-1].KeywordAddr,Var);
             ST_Result stResult;
-            stResult.bIsNextLine = true;
-            pCmdUint->SetResult(stResult);
+            stResult.bIsNextCmd = true;
+            CmdUintIn.SetResult(stResult);
         }
     }
     return result;
@@ -201,8 +202,9 @@ BaseToken Actuator::GetVariable(BaseToken inputToken)
 {
     BaseToken outputToken;
     outputToken.bInit = false;
-    if(TokenType_Assignment != inputToken.enTokenType)
+    if(TokenType_Variable != inputToken.enTokenType)
     {
+        printf("GetVariableERROR:Input token is not variable type!\n");
         return outputToken;
     }
     VariableUint* pVar = m_pVariableManager->GetVariable(inputToken.nBuffID,inputToken.KeywordAddr);

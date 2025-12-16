@@ -19,7 +19,7 @@ private:
 
 
     bool m_bIsCmdInit = false;
-    bool m_bCmdRunDone=false;
+
     EN_CmdType m_enCmdType = CmdType_NULL;
     //执行后是否跳转
     ST_Result m_stResult;
@@ -39,8 +39,7 @@ public:
     int InitCmd();
     int InitCmdType();
     bool IsInitCmd();
-    int SetCmdRunDone(bool done);
-    bool IsCmdRunDone();
+
 
     int ResetCmd();
     int SetResult(ST_Result stResult);

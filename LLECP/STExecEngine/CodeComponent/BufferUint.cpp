@@ -80,10 +80,14 @@ int BufferUint::StatementMatching()
         for (size_t j = 0; j < m_vLineList[i].m_vCmd.size(); j++)
         {
             //监测到IF，查找对应的非满足跳转位置
-            if (m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_IF)
+            if ((m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_IF) || 
+                (m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_ELSEIF) ||
+                (m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_ELSE))
             {
                 //无法判断是否为行最后一句，因此从当前开始
                 int nLevel = -1;
+                if(m_vLineList[i].m_vCmd[j].GetCmdType() != CmdType_IF)
+                    nLevel = 0;
                 bool bFind = false;
                 vector<ST_PosIndex> v_pos;
                 v_pos.push_back(ST_PosIndex(i,j));
@@ -94,7 +98,30 @@ int BufferUint::StatementMatching()
                     {
                         if ((m_vLineList[it].m_vCmd[jt].GetCmdType() == CmdType_ELSEIF)&&(0 == nLevel))
                         {
-                            v_pos.push_back(ST_PosIndex(it,jt));
+                            if(jt == m_vLineList[it].m_vCmd.size())
+                            {
+                                v_pos.push_back(ST_PosIndex(it+1,0));
+                            }
+                            else
+                            {
+                                v_pos.push_back(ST_PosIndex(it,jt+1));
+                            }
+                            bFind = true;
+                            break;
+                        }
+                        if ((m_vLineList[it].m_vCmd[jt].GetCmdType() == CmdType_ELSE)&&(0 == nLevel))
+                        {
+                            //ELSE 不匹配else
+                            if(m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_ELSE)
+                                continue;
+                            if(jt == m_vLineList[it].m_vCmd.size())
+                            {
+                                v_pos.push_back(ST_PosIndex(it+1,0));
+                            }
+                            else
+                            {
+                                v_pos.push_back(ST_PosIndex(it,jt+1));
+                            }
                             bFind = true;
                             break;
                         }

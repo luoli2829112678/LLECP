@@ -1,14 +1,14 @@
 #include"Actuator.h"
-ST_Result Actuator::ExecuteLogicalStatement(CmdUint* pCmdUint)
+ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
 {
     //到此处时所有函数已经执行完成，所有变量已经转换为常量
     ST_Result result;
-    std::vector<BaseToken>* pvToken = pCmdUint->GetToken();
+    std::vector<BaseToken>* pvToken = CmdUint.GetToken();
     int nType = (*pvToken)[0].KeywordAddr;
     uint16_t nCmdSize = pvToken->size();
     BaseToken JudgmentResult;
     std::vector<BaseToken>v_Judgment;
-    std::vector<UN_TransitionParam> v_Param;
+    std::vector<UN_TransitionParam> v_Param = CmdUint.GetCmdParam();;
     switch (nType)
     {
     case LogicalStatementType_IF:
@@ -20,7 +20,7 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint* pCmdUint)
                 printf("ErrorExecuteLogicalStatement\n");
                 break;
             }
-            for (size_t i = 1; i < nCmdSize - 2; i++)
+            for (size_t i = 1; i < nCmdSize - 1; i++)
             {
                 v_Judgment.push_back((*pvToken)[i]);
             }
@@ -28,32 +28,37 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint* pCmdUint)
             if((JudgmentResult.enTokenType == TokenType_INTNumber)&&((int)JudgmentResult.KeywordAddr != 0))
             {
                 //条件成立，继续执行
-                result.bIsNextLine = true;
+                result.bIsNextCmd = true;
             }
             else
             {
-                //条件不成立，跳转到else或end_if
-                v_Param = pCmdUint->GetCmdParam();
+                //条件不成立，跳转到else的下一句  或end_if
                 if(v_Param.size() >= 1)
                 {
                     result.bIsJump = true;
                     result.nJumpLinePos = v_Param[0].nParam;
                     result.nJumpCmdPos = v_Param[1].nParam;
-                    result.bIsNextLine = false;
+                    result.bIsNextCmd = false;
                 }
                 else
                 {
                     //没有else或end_if，直接结束
-                    result.bIsNextLine = false;
+                    result.bIsNextCmd = false;
                     printf("ErrorExecuteLogicalStatement\n");
                 }
             }
         }
         break;
+    //ELSE直接跳到end if，真正的else直接跳到语句
     case LogicalStatementType_ELSE:
+        result.bIsJump = true;
+        result.nJumpLinePos = v_Param[0].nParam;
+        result.nJumpCmdPos = v_Param[1].nParam;
+        result.bIsNextCmd = false;
+        break;
     case LogicalStatementType_END_IF:
         //结束IF，直接执行
-        result.bIsNextLine = true;
+        result.bIsNextCmd = true;
         break;
     case LogicalStatementType_LOOP:
         if(nCmdSize < 3)
@@ -67,26 +72,26 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint* pCmdUint)
             v_Judgment.push_back((*pvToken)[i]);
         }
         JudgmentResult = Calculator(v_Judgment);
-        if(pCmdUint->GetCmdState()[0].nParam < (int)JudgmentResult.KeywordAddr)
+        if(CmdUint.GetCmdState()[0].nParam < (int)JudgmentResult.KeywordAddr)
         {
-            result.bIsNextLine = true;
+            result.bIsNextCmd = true;
         }
         else
         {
             //跳出循环，跳转到end_loop
-            v_Param = pCmdUint->GetCmdParam();
+            v_Param = CmdUint.GetCmdParam();
             if(v_Param.size() >= 2)
             {
                 result.bIsJump = true;
                 result.nJumpLinePos = v_Param[0].nParam;
                 //循环类的·需要+1，因为end_loop会跳转回来
                 result.nJumpCmdPos = v_Param[1].nParam + 1;
-                result.bIsNextLine = true;
+                result.bIsNextCmd = true;
             }
             else
             {
                 //没有end_loop，直接结束
-                result.bIsNextLine = false;
+                result.bIsNextCmd = false;
                 result.bResetCmd = true;
                 printf("ErrorExecuteLogicalStatement\n");
             }
@@ -94,18 +99,18 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint* pCmdUint)
         break;
     case LogicalStatementType_END_LOOP:
         //跳回LOOP处
-        v_Param = pCmdUint->GetCmdParam();
+        v_Param = CmdUint.GetCmdParam();
         if(v_Param.size() >= 2)
         {
             result.bIsJump = true;
             result.nJumpLinePos = v_Param[0].nParam;
             result.nJumpCmdPos = v_Param[1].nParam;
-            result.bIsNextLine = true;
+            result.bIsNextCmd = true;
         }
         else
         {
             //没有LOOP，直接结束
-            result.bIsNextLine = false;
+            result.bIsNextCmd = false;
             printf("ErrorExecuteLogicalStatement\n");
         }
         break;
@@ -124,42 +129,42 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint* pCmdUint)
         if((JudgmentResult.enTokenType == TokenType_INTNumber)&&((int)JudgmentResult.KeywordAddr != 0))
         {
             //条件成立，继续执行
-            result.bIsNextLine = true;
+            result.bIsNextCmd = true;
         }
         else
         {
             //条件不成立，跳转到end_while
-            v_Param = pCmdUint->GetCmdParam();
+            v_Param = CmdUint.GetCmdParam();
             if(v_Param.size() >= 2)
             {
                 result.bIsJump = true;
                 result.nJumpLinePos = v_Param[0].nParam;
                 result.nJumpCmdPos = v_Param[1].nParam + 1;
-                result.bIsNextLine = true;
+                result.bIsNextCmd = true;
                 result.bResetCmd = true;
             }
             else
             {
                 //没有end_while，直接结束
-                result.bIsNextLine = false;
+                result.bIsNextCmd = false;
                 printf("ErrorExecuteLogicalStatement\n");
             }
         }
         break;
     case LogicalStatementType_END_WHILE:
         //跳回LOOP处
-        v_Param = pCmdUint->GetCmdParam();
+        v_Param = CmdUint.GetCmdParam();
         if(v_Param.size() >= 2)
         {
             result.bIsJump = true;
             result.nJumpLinePos = v_Param[0].nParam;
             result.nJumpCmdPos = v_Param[1].nParam;
-            result.bIsNextLine = true;
+            result.bIsNextCmd = true;
         }
         else
         {
             //没有LOOP，直接结束
-            result.bIsNextLine = false;
+            result.bIsNextCmd = false;
             printf("ErrorExecuteLogicalStatement\n");
         }
         break;
@@ -168,6 +173,6 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint* pCmdUint)
     default:
         break;
     }
-    pCmdUint->SetResult(result);
+    CmdUint.SetResult(result);
     return result;
 }

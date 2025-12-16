@@ -1,6 +1,8 @@
 #include"Calculator.h"
 BaseToken Calculator(vector<BaseToken> vToken)
 {
+    BaseToken result;
+    result.bInit = false;
     //先计算括号内的内容
     for (size_t i = 0; i < vToken.size(); i++)
     {
@@ -56,7 +58,7 @@ BaseToken Calculator(vector<BaseToken> vToken)
             //拿出两个Token进行计算
             BaseToken operand1 = vToken[i - 1];
             BaseToken operand2 = vToken[i + 1];
-            BaseToken result;
+            
             result.enTokenType = TokenType_DOUBLENumber;
             //乘除法
             if (vToken[i].KeywordAddr == OperatorType_Ride)
@@ -91,7 +93,6 @@ BaseToken Calculator(vector<BaseToken> vToken)
             //拿出两个Token进行计算
             BaseToken operand1 = vToken[i - 1];
             BaseToken operand2 = vToken[i + 1];
-            BaseToken result;
             result.enTokenType = TokenType_DOUBLENumber;
             //乘除法
             if (vToken[i].KeywordAddr == OperatorType_PLUS)
@@ -104,7 +105,7 @@ BaseToken Calculator(vector<BaseToken> vToken)
             }
             else
             {
-                continue; // 不是加减法，跳过
+                continue; // 
             }
             //替换掉原来的三个Token
             vToken.erase(
@@ -119,9 +120,75 @@ BaseToken Calculator(vector<BaseToken> vToken)
         }
     }
     //大于小于计算
+    for (size_t i = 0; i < vToken.size(); i++)
+    {
+        if (vToken[i].enTokenType == TokenType_Operator)
+        {
+            //拿出两个Token进行计算
+            BaseToken operand1 = vToken[i - 1];
+            BaseToken operand2 = vToken[i + 1];
+            result.enTokenType = TokenType_INTNumber;
+            //乘除法
+            if (vToken[i].KeywordAddr == OperatorType_Greater)
+            {
+                result.KeywordAddr = operand1.KeywordAddr > operand2.KeywordAddr;
+            }
+            else if (vToken[i].KeywordAddr == OperatorType_Less)
+            {
+                result.KeywordAddr = operand1.KeywordAddr < operand2.KeywordAddr;
+            }
+            else
+            {
+                continue; 
+            }
+            //替换掉原来的三个Token
+            vToken.erase(
+                vToken.begin() + i - 1,
+                vToken.begin() + i + 2
+            );
+            vToken.insert(
+                vToken.begin() + i - 1,
+                result
+            );
+            i--; // 调整索引以继续处理
+        }
+    }
     //等于计算
+    for (size_t i = 0; i < vToken.size(); i++)
+    {
+        if (vToken[i].enTokenType == TokenType_Operator)
+        {
+            //拿出两个Token进行计算
+            BaseToken operand1 = vToken[i - 1];
+            BaseToken operand2 = vToken[i + 1];
+            result.enTokenType = TokenType_INTNumber;
+            //乘除法
+            if (vToken[i].KeywordAddr == OperatorType_Equal)
+            {
+                result.KeywordAddr = operand1.KeywordAddr == operand2.KeywordAddr;
+            }
+            else if (vToken[i].KeywordAddr == OperatorType_Unequal)
+            {
+                result.KeywordAddr = operand1.KeywordAddr != operand2.KeywordAddr;
+            }
+            else
+            {
+                continue; //
+            }
+            //替换掉原来的三个Token
+            vToken.erase(
+                vToken.begin() + i - 1,
+                vToken.begin() + i + 2
+            );
+            vToken.insert(
+                vToken.begin() + i - 1,
+                result
+            );
+            i--; // 调整索引以继续处理
+        }
+    }
     //与或非
     //返回结果
-    BaseToken result;
+    result.bInit = true;
     return result;
 }

@@ -47,15 +47,6 @@ bool CmdUint::IsInitCmd()
 {
     return m_bIsCmdInit;
 }
-int CmdUint::SetCmdRunDone(bool done)
-{
-    m_bCmdRunDone = done;
-    return 0;
-}
-bool CmdUint::IsCmdRunDone()
-{
-    return m_bCmdRunDone;
-}
 
 EN_CmdType CmdUint::GetCmdType()
 {
@@ -65,7 +56,6 @@ EN_CmdType CmdUint::GetCmdType()
 int CmdUint::ResetCmd()
 {
     m_vState.clear();
-    m_bCmdRunDone = false;
     return 0;
 }
 

@@ -13,11 +13,11 @@ private:
     FunctionManager* m_pFunctionManager;
 
     BaseToken GetVariable(BaseToken inputToken);
-    ST_Result ExecuteLogicalStatement(CmdUint* pCmdUint);
+    ST_Result ExecuteLogicalStatement(CmdUint pCmdUint);
 
 public:
     Actuator(VariableManager* pVariableManager,StructManager* pStructManager,FunctionManager* pFunctionManager);
-    int ExecuteLine(LineUint* pLineUint);
-    BaseToken ExecuteCommand(CmdUint* pCmdUint);
+    int ExecuteLine(LineUint pLineUint);
+    BaseToken ExecuteCommand(CmdUint& pCmdUint);
     ~Actuator();
 };

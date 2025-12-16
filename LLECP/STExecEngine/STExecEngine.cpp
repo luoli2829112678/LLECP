@@ -47,7 +47,7 @@ int STExecEngine::STEE_PushCmd(string scmd)
 int STExecEngine::InitProgramManager()
 {
     m_ProgramManager.m_bProgramRunDone = false;
-    for (size_t i = 0; i < m_nPushBufferID; i++)
+    for (size_t i = 0; i < m_nPushBufferID + 1; i++)
     {
         m_ProgramManager.InitBuffer(i);
     }
@@ -60,54 +60,61 @@ int STExecEngine::ExecuteProgram()
     {
         if(m_ProgramManager.m_BufferUint[i].m_bBuffEnable && !m_ProgramManager.m_BufferUint[i].m_bBufferRunDone)
         {
-            int nRunLine = m_ProgramManager.m_BufferUint[i].m_nLineRunIndex;
-            int nRunCmd = m_ProgramManager.m_BufferUint[i].m_vLineList[nRunLine].nCmdRunIndex;
-            CmdUint* pRunCmd = &m_ProgramManager.m_BufferUint[i].m_vLineList[nRunLine].m_vCmd[nRunCmd];
-            m_pActuator->ExecuteCommand(pRunCmd);
-            ST_Result CmdResult = pRunCmd->GetResult();
-            //跳转
-            if(CmdResult.bIsJump)
+            uint32_t* pRunLine = &m_ProgramManager.m_BufferUint[i].m_nLineRunIndex;
+            uint32_t* pRunCmd = &m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].nCmdRunIndex;
+            for (;*pRunLine < m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd.size();)
             {
-                m_ProgramManager.m_BufferUint[i].m_nLineRunIndex = CmdResult.nJumpLinePos;
-                m_ProgramManager.m_BufferUint[i].m_vLineList[CmdResult.nJumpLinePos].nCmdRunIndex = CmdResult.nJumpCmdPos;
-                break;
-            }
-            //非等待
-            if(pRunCmd->IsCmdRunDone())
-            {
-                //行最后一句执行完成
-                if(nRunCmd == m_ProgramManager.m_BufferUint[i].m_vLineList[nRunLine].m_vCmd.size()-1)
+                CmdUint RunCmd = m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd[*pRunCmd];
+                m_pActuator->ExecuteCommand(RunCmd);
+                ST_Result CmdResult = RunCmd.GetResult();
+                if(CmdResult.bIsJump)
                 {
-                    //判断是否为最后一行
-                    if(nRunLine == m_ProgramManager.m_BufferUint[i].m_vLineList.size()-1)
-                    {
-                        //最后一行
-                        m_ProgramManager.m_BufferUint[i].m_bBufferRunDone = true;
-                        //判断工程是否执行完成
-                        for( size_t j = 0; j <= m_ProgramManager.m_PushBufferID; j++)
-                        {
-                            if(m_ProgramManager.m_BufferUint[j].m_bBuffEnable && !m_ProgramManager.m_BufferUint[j].m_bBufferRunDone)
-                            {
-                                break;
-                            }
-                            if(j == m_ProgramManager.m_PushBufferID)
-                            {
-                                //所有buffer执行完成
-                                m_ProgramManager.m_bProgramRunDone = true;
-                                printf("ExecuteProgram:All Program Execute Done!\n");
-                            }
-                        }
-                        break;
-                    }
-                    //行结束
-                    m_ProgramManager.m_BufferUint[i].m_nLineRunIndex++;
-                    m_ProgramManager.m_BufferUint[i].m_vLineList[m_ProgramManager.m_BufferUint[i].m_nLineRunIndex].nCmdRunIndex = 0;
+                    m_ProgramManager.m_BufferUint[i].m_nLineRunIndex = CmdResult.nJumpLinePos;
+                    m_ProgramManager.m_BufferUint[i].m_vLineList[CmdResult.nJumpLinePos].nCmdRunIndex = CmdResult.nJumpCmdPos;
+                    continue;
+                }
+                
+                //BUFFER 跳出
+                if(!CmdResult.bIsNextCmd)
+                {
+                    break;
                 }
                 else
                 {
-                    m_ProgramManager.m_BufferUint[i].m_vLineList[nRunLine].nCmdRunIndex++;
+                    //行最后一句执行完成
+                    if(*pRunLine == m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd.size()-1)
+                    {
+                        //判断是否为最后一行
+                        if(*pRunLine == m_ProgramManager.m_BufferUint[i].m_vLineList.size()-1)
+                        {
+                            //最后一行
+                            m_ProgramManager.m_BufferUint[i].m_bBufferRunDone = true;
+                            //判断工程是否执行完成
+                            for( size_t j = 0; j <= m_ProgramManager.m_PushBufferID; j++)
+                            {
+                                if(m_ProgramManager.m_BufferUint[j].m_bBuffEnable && !m_ProgramManager.m_BufferUint[j].m_bBufferRunDone)
+                                {
+                                    break;
+                                }
+                                if(j == m_ProgramManager.m_PushBufferID)
+                                {
+                                    //所有buffer执行完成
+                                    m_ProgramManager.m_bProgramRunDone = true;
+                                    printf("ExecuteProgram:All Program Execute Done!\n");
+                                }
+                            }
+                            break;
+                        }
+                        //行结束
+                        m_ProgramManager.m_BufferUint[i].m_nLineRunIndex++;
+                        m_ProgramManager.m_BufferUint[i].m_vLineList[m_ProgramManager.m_BufferUint[i].m_nLineRunIndex].nCmdRunIndex = 0;
+                    }
+                    else
+                    {
+                        m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].nCmdRunIndex++;
+                    }
                 }
-                break;
+
             }
         }
     }

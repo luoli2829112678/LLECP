@@ -14,15 +14,15 @@ struct ST_Result
     //跳转位置
     uint32_t nJumpLinePos;
     uint32_t nJumpCmdPos;
-    //是否执行下一行
-    bool bIsNextLine;
+    //是否执行下一句子
+    bool bIsNextCmd;
     bool bResetCmd;
     ST_Result()
     {
         bIsJump = false;
         nJumpLinePos = 0;
         nJumpCmdPos = 0;
-        bIsNextLine = true;
+        bIsNextCmd = true;
         bResetCmd = false;
     }
 };
