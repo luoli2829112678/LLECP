@@ -150,7 +150,7 @@ BaseToken Actuator::ExecuteCommand(CmdUint& CmdUintIn)
             }
         }
     }
-    // 2️计算并替换这一段 token
+    // 2计算并替换这一段 token
     if (firstOpIndex != -1 && lastOpIndex >= firstOpIndex)
     {
         // ① 取出要计算的这段表达式（这里是从第一个运算符到最后一个运算符）
@@ -187,6 +187,20 @@ BaseToken Actuator::ExecuteCommand(CmdUint& CmdUintIn)
             {
                 printf("ExecuteCommandERROR:Left side of Assignment is not variable!\n");
                 break;
+            }
+            //数据类型判定
+            BaseToken varToken_L = GetVariable((*TokenList)[i-1]);
+            switch (varToken_L.enTokenType)
+            {
+                case TokenType_INTNumber:
+                    (*TokenList)[i+1].enTokenType = TokenType_INTNumber;
+                    break;
+                case TokenType_DOUBLENumber:
+                    (*TokenList)[i+1].enTokenType = TokenType_DOUBLENumber;
+                    break;
+                
+                default:
+                    break;
             }
             VariableUint Var = BaseToken2VariableUint((*TokenList)[i+1]);
             m_pVariableManager->SetVariable((*TokenList)[i-1].nBuffID,(*TokenList)[i-1].KeywordAddr,Var);

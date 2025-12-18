@@ -265,6 +265,16 @@ BaseToken Parser::LogicalStatement_Parse(string cmd)
         T_Token.enTokenType = TokenType_LogicalStatement;
         T_Token.KeywordAddr = LogicalStatementType_END_IF;
     }
+    else if (cmd == sCmd_LOOP)
+    {
+        T_Token.enTokenType = TokenType_LogicalStatement;
+        T_Token.KeywordAddr = LogicalStatementType_LOOP;
+    }
+    else if (cmd == sCmd_END_LOOP)
+    {
+        T_Token.enTokenType = TokenType_LogicalStatement;
+        T_Token.KeywordAddr = LogicalStatementType_END_LOOP;
+    }
     else if (cmd == sCmd_WHILE)
     {
         T_Token.enTokenType = TokenType_LogicalStatement;

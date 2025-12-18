@@ -99,7 +99,7 @@ BaseToken Calculator(vector<BaseToken> vToken)
             {
                 result.KeywordAddr = operand1.KeywordAddr + operand2.KeywordAddr;
             }
-            else if (vToken[i].KeywordAddr == OperatorType_Division)
+            else if (vToken[i].KeywordAddr == OperatorType_Subtract)
             {
                 result.KeywordAddr = operand1.KeywordAddr - operand2.KeywordAddr;
             }

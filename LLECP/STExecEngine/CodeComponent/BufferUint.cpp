@@ -84,6 +84,17 @@ int BufferUint::StatementMatching()
                 (m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_ELSEIF) ||
                 (m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_ELSE))
             {
+                if ((m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_ELSEIF) ||
+                    (m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_ELSE))
+                {
+                    //初始化状态大小为1
+                    vector<UN_TransitionParam>vTCmdParam;
+                    UN_TransitionParam CmdParam;
+                    CmdParam.nParam = 0;//为1就是该else/elsif不需要执行，直接跳，因为if执行了
+                    vTCmdParam.push_back(CmdParam);
+                    m_vLineList[i].m_vCmd[j].SetCmdState(vTCmdParam);
+                }
+
                 //无法判断是否为行最后一句，因此从当前开始
                 int nLevel = 0;
                 bool bFind = false;
@@ -111,7 +122,7 @@ int BufferUint::StatementMatching()
                         {
                             v_pos.push_back(ST_PosIndex(it,jt));
                             bFind = true;
-                            break;
+                            continue;
                         }
                         if ((m_vLineList[it].m_vCmd[jt].GetCmdType() == CmdType_ELSE)&&(0 == nLevel))
                         {
@@ -132,14 +143,15 @@ int BufferUint::StatementMatching()
                         if (m_vLineList[it].m_vCmd[jt].GetCmdType() == CmdType_IF)
                         {
                             nLevel++;
+                            continue;
                         }
                         if (m_vLineList[it].m_vCmd[jt].GetCmdType() == CmdType_ENDIF)
                         {
                             nLevel--;
-                            break;
+                            continue;
                         }
                         if(bFind)
-                            break;
+                            continue;
                         
                     }
                     if(bFind)
@@ -161,8 +173,7 @@ int BufferUint::StatementMatching()
             {
                 int nLevel = -1;
                 bool bFind = false;
-                vector<ST_PosIndex> v_pos;
-                v_pos.push_back(ST_PosIndex(i,j));
+                vector<ST_PosIndex> v_pos;//to CmdType_WHILE
                 for (size_t it = i; it < m_vLineList.size(); it++)
                 {
                     for (size_t jt = j; jt < m_vLineList[it].m_vCmd.size(); jt++)
@@ -173,21 +184,24 @@ int BufferUint::StatementMatching()
                         }
                         if (m_vLineList[it].m_vCmd[jt].GetCmdType() == CmdType_ENDWHILE)
                         {
-                            nLevel--;
                             if(nLevel == 0)
                             {
                                 bFind = true;
                                 UN_TransitionParam param;
                                 param.nParam = i;
-                                std::vector<UN_TransitionParam> v_Param;
+                                std::vector<UN_TransitionParam> v_Param;//to CmdType_end WHILE
                                 v_Param.push_back(param);
                                 param.nParam = j;
                                 v_Param.push_back(param);
                                 //初始化ENDWHILE的跳转位置(WHILE的位置)
                                 m_vLineList[it].m_vCmd[jt].SetCmdParam(v_Param);
                                 v_pos.push_back(ST_PosIndex(it,jt));
-                            }
                                 break;
+                            }
+                            else
+                            {
+                                nLevel--;
+                            }
                         }
                         if(bFind)
                             break;
@@ -196,14 +210,17 @@ int BufferUint::StatementMatching()
                     if(bFind)
                         break;
                 }
-                ST_PosIndex pos_while = v_pos[0];
-                ST_PosIndex pos_endwhile = v_pos[1];
+                ST_PosIndex pos_endwhile = v_pos[0];
                 //最后一行处理
-                if(pos_endwhile.nCmdPos +1 == m_vLineList[pos_endwhile.nLinePos].m_vCmd.size())
+                if(pos_endwhile.nCmdPos == m_vLineList[pos_endwhile.nLinePos].m_vCmd.size())
                 {
                     //在下一行添加跳转命令
                     pos_endwhile.nLinePos +=1;
                     pos_endwhile.nCmdPos = 0;
+                }
+                else
+                {
+                    pos_endwhile.nCmdPos +=1;
                 }
                 vector<UN_TransitionParam> v_param;
                 UN_TransitionParam param;
@@ -212,14 +229,13 @@ int BufferUint::StatementMatching()
                 param.nParam = pos_endwhile.nCmdPos;
                 v_param.push_back(param);
                 //WHILE语句初始化指向ENDWHILE的跳转位置
-                m_vLineList[pos_while.nLinePos].m_vCmd[pos_while.nCmdPos].SetCmdParam(v_param);
+                m_vLineList[i].m_vCmd[j].SetCmdParam(v_param);
             }
             else if (m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_LOOP)
             {
                 int nLevel = -1;
                 bool bFind = false;
-                vector<ST_PosIndex> v_pos;
-                v_pos.push_back(ST_PosIndex(i,j));
+                vector<ST_PosIndex> v_pos;//to CmdType_LOOP
                 for (size_t it = i; it < m_vLineList.size(); it++)
                 {
                     for (size_t jt = j; jt < m_vLineList[it].m_vCmd.size(); jt++)
@@ -230,21 +246,24 @@ int BufferUint::StatementMatching()
                         }
                         if (m_vLineList[it].m_vCmd[jt].GetCmdType() == CmdType_ENDLOOP)
                         {
-                            nLevel--;
                             if(nLevel == 0)
                             {
                                 bFind = true;
                                 UN_TransitionParam param;
                                 param.nParam = i;
-                                std::vector<UN_TransitionParam> v_Param;
+                                std::vector<UN_TransitionParam> v_Param;//to CmdType_end LOOP
                                 v_Param.push_back(param);
                                 param.nParam = j;
                                 v_Param.push_back(param);
-                                //初始化ENDWHILE的跳转位置(WHILE的位置)
+                                //初始化ENDLOOP的跳转位置(LOOP的位置)
                                 m_vLineList[it].m_vCmd[jt].SetCmdParam(v_Param);
                                 v_pos.push_back(ST_PosIndex(it,jt));
-                            }
                                 break;
+                            }
+                            else
+                            {
+                                nLevel--;
+                            }
                         }
                         if(bFind)
                             break;
@@ -253,26 +272,28 @@ int BufferUint::StatementMatching()
                     if(bFind)
                         break;
                 }
-                ST_PosIndex pos_Loop = v_pos[0];
-                ST_PosIndex pos_endLoop = v_pos[1];
+                ST_PosIndex pos_endwhile = v_pos[0];
                 //最后一行处理
-                if(pos_endLoop.nCmdPos +1 == m_vLineList[pos_endLoop.nLinePos].m_vCmd.size())
+                if(pos_endwhile.nCmdPos == m_vLineList[pos_endwhile.nLinePos].m_vCmd.size())
                 {
                     //在下一行添加跳转命令
-                    pos_endLoop.nLinePos +=1;
-                    pos_endLoop.nCmdPos = 0;
+                    pos_endwhile.nLinePos +=1;
+                    pos_endwhile.nCmdPos = 0;
+                }
+                else
+                {
+                    pos_endwhile.nCmdPos +=1;
                 }
                 vector<UN_TransitionParam> v_param;
                 UN_TransitionParam param;
-                param.nParam = pos_endLoop.nLinePos;
+                param.nParam = pos_endwhile.nLinePos;
                 v_param.push_back(param);
-                param.nParam = pos_endLoop.nCmdPos;
+                param.nParam = pos_endwhile.nCmdPos;
                 v_param.push_back(param);
-                //WHILE语句初始化指向ENDWHILE的跳转位置
-                m_vLineList[pos_Loop.nLinePos].m_vCmd[pos_Loop.nCmdPos].SetCmdParam(v_param);
+                //LOOP语句初始化指向ENDLOOP的跳转位置
+                m_vLineList[i].m_vCmd[j].SetCmdParam(v_param);
             }
         }
-        
     }
     
     return 0;

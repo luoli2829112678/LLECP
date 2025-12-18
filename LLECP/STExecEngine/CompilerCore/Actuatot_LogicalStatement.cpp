@@ -142,7 +142,7 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
             printf("ErrorExecuteLogicalStatement\n");
             break;
         }
-        for (size_t i = 1; i < nCmdSize - 2; i++)
+        for (size_t i = 1; i < nCmdSize - 1; i++)
         {
             v_Judgment.push_back((*pvToken)[i]);
         }

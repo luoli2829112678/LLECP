@@ -33,6 +33,8 @@
 #define sCmd_ELSIF          "ELSIF"
 #define sCmd_ELSE           "ELSE"
 #define sCmd_END_IF         "END_IF"
+#define sCmd_LOOP           "LOOP"
+#define sCmd_END_LOOP         "END_LOOP"
 #define sCmd_DO              "DO"
 #define sCmd_BY              "BY"
 #define sCmd_WHILE           "WHILE"

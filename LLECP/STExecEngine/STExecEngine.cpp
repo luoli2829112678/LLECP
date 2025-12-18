@@ -62,12 +62,12 @@ int STExecEngine::ExecuteProgram()
         {
             uint32_t* pRunLine = &m_ProgramManager.m_BufferUint[i].m_nLineRunIndex;
             uint32_t* pRunCmd = &m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].nCmdRunIndex;
-            for (;*pRunLine < m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd.size();)
+            for (;*pRunCmd < m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd.size();)
             {
                 CmdUint RunCmd = m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd[*pRunCmd];
                 m_pActuator->ExecuteCommand(RunCmd);
                 ST_Result CmdResult = RunCmd.GetResult();
-                //if执行完成后面的else/elseif跳转
+                //if执行完成后面的else/elseif跳转 该if 的if elseif else 状态全部为1
                 if((!CmdResult.bIsJump)&&(RunCmd.GetCmdType() == CmdType_IF || RunCmd.GetCmdType() == CmdType_ELSEIF))
                 {
                     std::vector<UN_TransitionParam> vCmdParam = RunCmd.GetCmdParam();
@@ -77,9 +77,14 @@ int STExecEngine::ExecuteProgram()
                         int nJumpCmd  = vCmdParam[1].nParam;
                         UN_TransitionParam CmdParam;
                         CmdParam.nParam = 1;
-                        vector<UN_TransitionParam>vTCmdParam;
-                        vTCmdParam.push_back(CmdParam);
-                        m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].SetCmdState(vTCmdParam);
+                        vector<UN_TransitionParam>vTCmdParam = m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].GetCmdState();
+                        if(vTCmdParam.size() > 0)//end_if不需要
+                        {
+                            vTCmdParam[0] = CmdParam;
+                            m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].SetCmdState(vTCmdParam);
+                            
+                        }
+                        //拿出下一个节点
                         vCmdParam = m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].GetCmdParam();
                     }
                 }
@@ -98,7 +103,7 @@ int STExecEngine::ExecuteProgram()
                 else
                 {
                     //行最后一句执行完成
-                    if(*pRunLine == m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd.size()-1)
+                    if(*pRunCmd == m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd.size()-1)
                     {
                         //判断是否为最后一行
                         if(*pRunLine == m_ProgramManager.m_BufferUint[i].m_vLineList.size()-1)
