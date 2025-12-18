@@ -85,27 +85,31 @@ int BufferUint::StatementMatching()
                 (m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_ELSE))
             {
                 //无法判断是否为行最后一句，因此从当前开始
-                int nLevel = -1;
-                if(m_vLineList[i].m_vCmd[j].GetCmdType() != CmdType_IF)
-                    nLevel = 0;
+                int nLevel = 0;
                 bool bFind = false;
                 vector<ST_PosIndex> v_pos;
                 v_pos.push_back(ST_PosIndex(i,j));
-                //从当前位置开始遍历
-                for (size_t it = i; it < m_vLineList.size(); it++)
+
+                size_t it = i;
+                size_t jt = j;
+                //从下一句开始执行
+                if(jt +1 < m_vLineList[it].m_vCmd.size())
                 {
-                    for (size_t jt = j; jt < m_vLineList[it].m_vCmd.size(); jt++)
+                    jt++;
+                }
+                else
+                {
+                    it++;
+                    jt = 0;
+                }
+                //从当前位置开始遍历
+                for (; it < m_vLineList.size(); it++)
+                {
+                    for (; jt < m_vLineList[it].m_vCmd.size(); jt++)
                     {
                         if ((m_vLineList[it].m_vCmd[jt].GetCmdType() == CmdType_ELSEIF)&&(0 == nLevel))
                         {
-                            if(jt == m_vLineList[it].m_vCmd.size())
-                            {
-                                v_pos.push_back(ST_PosIndex(it+1,0));
-                            }
-                            else
-                            {
-                                v_pos.push_back(ST_PosIndex(it,jt+1));
-                            }
+                            v_pos.push_back(ST_PosIndex(it,jt));
                             bFind = true;
                             break;
                         }
@@ -114,14 +118,7 @@ int BufferUint::StatementMatching()
                             //ELSE 不匹配else
                             if(m_vLineList[i].m_vCmd[j].GetCmdType() == CmdType_ELSE)
                                 continue;
-                            if(jt == m_vLineList[it].m_vCmd.size())
-                            {
-                                v_pos.push_back(ST_PosIndex(it+1,0));
-                            }
-                            else
-                            {
-                                v_pos.push_back(ST_PosIndex(it,jt+1));
-                            }
+                            v_pos.push_back(ST_PosIndex(it,jt));
                             bFind = true;
                             break;
                         }

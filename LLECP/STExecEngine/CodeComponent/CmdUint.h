@@ -18,9 +18,9 @@ private:
 
 
 
-    bool m_bIsCmdInit = false;
+    bool m_bIsCmdInit;
 
-    EN_CmdType m_enCmdType = CmdType_NULL;
+    EN_CmdType m_enCmdType;
     //执行后是否跳转
     ST_Result m_stResult;
     //执行后跳转目标位置

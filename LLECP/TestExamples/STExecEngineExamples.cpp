@@ -10,9 +10,11 @@ int main()
     STExecEngine_inst.STEE_PushCmd("INT C;");
     VariableUint* pvarA = STExecEngine_inst.m_VariableManager.GetVariable(0,"A");
     VariableUint* pvarB = STExecEngine_inst.m_VariableManager.GetVariable(0,"B");
-    STExecEngine_inst.STEE_PushCmd("A:=10.0+1;");
-    STExecEngine_inst.STEE_PushCmd("IF A > 2 THEN");
+    STExecEngine_inst.STEE_PushCmd("A:=26.0;");
+    STExecEngine_inst.STEE_PushCmd("IF A > 20 THEN");
     STExecEngine_inst.STEE_PushCmd("B:=20;");
+    STExecEngine_inst.STEE_PushCmd("ELSIF A > 5 THEN");
+    STExecEngine_inst.STEE_PushCmd("B:=25;");
     STExecEngine_inst.STEE_PushCmd("ELSE");
     STExecEngine_inst.STEE_PushCmd("B:=30;");
     STExecEngine_inst.STEE_PushCmd("END_IF;");

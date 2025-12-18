@@ -11,6 +11,8 @@ CmdUint::~CmdUint()
 
 int CmdUint::SetCmdUint(std::vector<BaseToken> vToken)
 {
+    m_bIsCmdInit = false;
+    m_enCmdType = CmdType_NULL;
     m_vToken = vToken;
     return 0;
 }

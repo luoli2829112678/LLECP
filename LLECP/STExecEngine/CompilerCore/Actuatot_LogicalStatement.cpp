@@ -13,6 +13,18 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
     {
     case LogicalStatementType_IF:
     case LogicalStatementType_ELSIF:
+        if(CmdUint.GetCmdState().size() != 0)
+        {
+            if(CmdUint.GetCmdState()[0].nParam != 0)
+            {
+            //已经执行过，直接跳过
+            result.bIsJump = true;
+            result.nJumpLinePos = v_Param[0].nParam;
+            result.nJumpCmdPos = v_Param[1].nParam;
+            result.bIsNextCmd = false;
+            break;
+            }
+        }
         {
             if(nCmdSize < 3)
             {
@@ -49,12 +61,21 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
             }
         }
         break;
-    //ELSE直接跳到end if，真正的else直接跳到语句
+    //
     case LogicalStatementType_ELSE:
-        result.bIsJump = true;
-        result.nJumpLinePos = v_Param[0].nParam;
-        result.nJumpCmdPos = v_Param[1].nParam;
-        result.bIsNextCmd = false;
+        if(CmdUint.GetCmdState().size() != 0)
+        {
+            if(CmdUint.GetCmdState()[0].nParam != 0)
+            {
+            //已经执行过，直接跳过
+            result.bIsJump = true;
+            result.nJumpLinePos = v_Param[0].nParam;
+            result.nJumpCmdPos = v_Param[1].nParam;
+            result.bIsNextCmd = false;
+            break;
+            }
+        }
+        result.bIsNextCmd = true;
         break;
     case LogicalStatementType_END_IF:
         //结束IF，直接执行

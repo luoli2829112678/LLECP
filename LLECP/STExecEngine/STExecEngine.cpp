@@ -67,6 +67,22 @@ int STExecEngine::ExecuteProgram()
                 CmdUint RunCmd = m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd[*pRunCmd];
                 m_pActuator->ExecuteCommand(RunCmd);
                 ST_Result CmdResult = RunCmd.GetResult();
+                //if执行完成后面的else/elseif跳转
+                if((!CmdResult.bIsJump)&&(RunCmd.GetCmdType() == CmdType_IF || RunCmd.GetCmdType() == CmdType_ELSEIF))
+                {
+                    std::vector<UN_TransitionParam> vCmdParam = RunCmd.GetCmdParam();
+                    while(vCmdParam.size()>=2)
+                    {
+                        int nJumpLine = vCmdParam[0].nParam;;
+                        int nJumpCmd  = vCmdParam[1].nParam;
+                        UN_TransitionParam CmdParam;
+                        CmdParam.nParam = 1;
+                        vector<UN_TransitionParam>vTCmdParam;
+                        vTCmdParam.push_back(CmdParam);
+                        m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].SetCmdState(vTCmdParam);
+                        vCmdParam = m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].GetCmdParam();
+                    }
+                }
                 if(CmdResult.bIsJump)
                 {
                     m_ProgramManager.m_BufferUint[i].m_nLineRunIndex = CmdResult.nJumpLinePos;
