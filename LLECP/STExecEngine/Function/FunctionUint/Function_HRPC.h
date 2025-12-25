@@ -1,9 +1,10 @@
 #pragma once
-#include"FunctionInfo.h"
+#include"../FunctionInfo.h"
+
 class Function_HRPC: public FunctionInfo
 {
-private:
-    int Execution()override;
+protected:
+    VariableUint Execution()override;
     /* data */
 public:
     Function_HRPC(/* args */);

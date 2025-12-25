@@ -152,8 +152,8 @@ int BufferUint::StatementMatching()
                         }
                         if(bFind)
                             continue;
-                        
                     }
+                    jt = 0;
                     if(bFind)
                         break;
                 }

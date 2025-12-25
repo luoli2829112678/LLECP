@@ -64,56 +64,78 @@ BaseToken Actuator::ExecuteCommand(CmdUint& CmdUintIn)
     {
         if(TokenType_Function == (*TokenList)[i].enTokenType)
         {
-            FunctionInfo fun = m_pFunctionManager->GetFunction((*TokenList)[i].KeywordAddr);
+            FunctionInfo* fun = m_pFunctionManager->GetFunction((*TokenList)[i].KeywordAddr);
+            if(!fun)
+            {
+                printf("ExecuteCommandERROR:Function not found!\n");
+                break;
+            }
             //遍历
             //层数
-            int nHierarchy = 0;
+            int nHierarchy = -1;
+            int ParamID = 0;
             int nFunEnd = -1;
             vector<CmdUint> subCmd;
-            vector<BaseToken> subToken;
-            for (size_t j = i+1; i < TokenList->size(); j++)
+            vector<vector<BaseToken>> subToken;
+            subToken.push_back(vector<BaseToken>());
+            for (size_t j = i+1; j < TokenList->size(); j++)
             {
-                if((nHierarchy == 0)&&((*TokenList)[j].KeywordAddr == DelimiterType_Parentheses_R))
+                if((nHierarchy == 0)&&((*TokenList)[j].KeywordAddr == DelimiterType_Parentheses_R)&&(TokenType_Delimiter == (*TokenList)[j].enTokenType))
                 {
                     nFunEnd = j;
                     break;
                 }
-                if((*TokenList)[j].KeywordAddr == DelimiterType_Parentheses_L)
+                if(((*TokenList)[j].KeywordAddr == DelimiterType_Parentheses_L)&&(TokenType_Delimiter == (*TokenList)[j].enTokenType))
                 {
                     nHierarchy++;
                     continue;
                 }
-                if((*TokenList)[j].KeywordAddr == DelimiterType_Parentheses_R)
+                if(((*TokenList)[j].KeywordAddr == DelimiterType_Parentheses_R)&&(TokenType_Delimiter == (*TokenList)[j].enTokenType))
                 {
                     nHierarchy--;
                     continue;
                 }
-                if((*TokenList)[j].KeywordAddr == TokenType_COMMA)
+                if((nHierarchy == 0)&&((*TokenList)[j].enTokenType == TokenType_COMMA))
                 {
-
-                    subToken.clear();
+                    ParamID++;
+                    subToken.push_back(vector<BaseToken>());
                     continue;
                 }
-                subToken.push_back((*TokenList)[j]);
+                subToken[ParamID].push_back((*TokenList)[j]);
             }
-            vector <BaseToken> paramToken;
             //回调计算值
-            for (size_t j = 0; j < subCmd.size(); j++)
+            for (size_t j = 0; j < subToken.size(); j++)
             {
-                paramToken.push_back(ExecuteCommand(subCmd[j]));
+                if(subToken[j].empty())
+                {
+                    printf("ExecuteCommandERROR:Function parameter format error!\n");
+                    break;
+                }
+                if(subToken[j].size() > 1)
+                {
+                    CmdUint tCmd;
+                    tCmd.SetCmdUint(subToken[j]);
+                    subToken[j] = vector<BaseToken>{ExecuteCommand(tCmd)};
+                }
             }
             //准备输入输出变量
             vector<VariableUint> InputVar;
-            for (size_t j = i+1; i < paramToken.size(); j++)
+            for (size_t j = 0; j < subToken.size(); j++)
             {
-                InputVar.push_back(BaseToken2VariableUint(paramToken[j]));
+                InputVar.push_back(BaseToken2VariableUint(subToken[j][0]));
             }
             //输入变量
-            VariableUint ResultVar = fun.CallFunc(InputVar);
+            VariableUint ResultVar = fun->CallFunc(InputVar);
+            
             BaseToken Funout = VariableUint2BaseToken(ResultVar);
             //删除函数并使用Funout替代
             TokenList->erase(TokenList->begin() + i,TokenList->begin() + nFunEnd + 1);
             TokenList->insert(TokenList->begin() + i,Funout);
+            //执行完成后检查是否只剩下一个token
+            if(TokenList->size() == 1)
+            {
+                return (*TokenList)[0];
+            }
         }
     }
     //第三优先级执行逻辑语句
@@ -171,6 +193,10 @@ BaseToken Actuator::ExecuteCommand(CmdUint& CmdUintIn)
             TokenList->begin() + firstOpIndex -1,
             resultToken
         );
+    }
+    if(TokenList->size() == 1)
+    {
+        return (*TokenList)[0];
     }
     
     //第五优先级执行赋值

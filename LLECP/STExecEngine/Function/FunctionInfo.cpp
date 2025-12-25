@@ -2,7 +2,7 @@
 
 FunctionInfo::FunctionInfo()
 {
-    
+    m_bChechkInput = true;
 }
 
 FunctionInfo::~FunctionInfo()
@@ -15,12 +15,20 @@ int FunctionInfo::GetFunctionName(string& sFunctionName)
      sFunctionName = m_sFunctionName;
      return 0;
 }
-int FunctionInfo::Execution()
+VariableUint FunctionInfo::Execution()
 {
-     return 0;
+     VariableUint res;
+     return res;
 }
 VariableUint FunctionInfo::CallFunc(vector<VariableUint>Input)
 {
+     m_vInput = Input;
+     if(!m_bChechkInput)
+     {
+          //不检查输入，直接执行
+          return Execution();
+     }
+     //检查输入参数
      if(mmFunctionInput.size() != Input.size())
      {
           printf("FunctionInfo::CallFunc input output size not match\n");
@@ -35,6 +43,5 @@ VariableUint FunctionInfo::CallFunc(vector<VariableUint>Input)
           }
      }
      //执行函数体 
-     Execution();    
-     return Result;
+     return Execution();    
 }

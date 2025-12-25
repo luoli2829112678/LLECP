@@ -35,6 +35,8 @@ enum EN_CmdType
     CmdType_Assignment,
     //变量声明
     CmdType_VariableDeclaration,
+    //函数执行
+    CmdType_Function,
     //IF
     CmdType_IF,
     CmdType_ELSEIF,

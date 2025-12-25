@@ -8,19 +8,19 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
     uint16_t nCmdSize = pvToken->size();
     BaseToken JudgmentResult;
     std::vector<BaseToken>v_Judgment;
-    std::vector<UN_TransitionParam> v_Param = CmdUint.GetCmdParam();;
+    std::vector<UN_TransitionParam>* p_vParam = CmdUint.GetCmdParam();
     switch (nType)
     {
     case LogicalStatementType_IF:
     case LogicalStatementType_ELSIF:
-        if(CmdUint.GetCmdState().size() != 0)
+        if(CmdUint.GetCmdState()->size() != 0)
         {
-            if(CmdUint.GetCmdState()[0].nParam != 0)
+            if(CmdUint.GetCmdState()->at(0).nParam != 0)
             {
             //已经执行过，直接跳过
             result.bIsJump = true;
-            result.nJumpLinePos = v_Param[0].nParam;
-            result.nJumpCmdPos = v_Param[1].nParam;
+            result.nJumpLinePos = p_vParam->at(0).nParam;
+            result.nJumpCmdPos = p_vParam->at(1).nParam;
             result.bIsNextCmd = false;
             break;
             }
@@ -45,11 +45,11 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
             else
             {
                 //条件不成立，跳转到else的下一句  或end_if
-                if(v_Param.size() >= 1)
+                if(p_vParam->size() >= 1)
                 {
                     result.bIsJump = true;
-                    result.nJumpLinePos = v_Param[0].nParam;
-                    result.nJumpCmdPos = v_Param[1].nParam;
+                    result.nJumpLinePos = p_vParam->at(0).nParam;
+                    result.nJumpCmdPos = p_vParam->at(1).nParam;
                     result.bIsNextCmd = false;
                 }
                 else
@@ -63,14 +63,14 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
         break;
     //
     case LogicalStatementType_ELSE:
-        if(CmdUint.GetCmdState().size() != 0)
+        if(CmdUint.GetCmdState()->size() != 0)
         {
-            if(CmdUint.GetCmdState()[0].nParam != 0)
+            if(CmdUint.GetCmdState()->at(0).nParam != 0)
             {
             //已经执行过，直接跳过
             result.bIsJump = true;
-            result.nJumpLinePos = v_Param[0].nParam;
-            result.nJumpCmdPos = v_Param[1].nParam;
+            result.nJumpLinePos = p_vParam->at(0).nParam;
+            result.nJumpCmdPos = p_vParam->at(1).nParam;
             result.bIsNextCmd = false;
             break;
             }
@@ -93,20 +93,20 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
             v_Judgment.push_back((*pvToken)[i]);
         }
         JudgmentResult = Calculator(v_Judgment);
-        if(CmdUint.GetCmdState()[0].nParam < (int)JudgmentResult.KeywordAddr)
+        if(CmdUint.GetCmdState()->at(0).nParam < (int)JudgmentResult.KeywordAddr)
         {
             result.bIsNextCmd = true;
         }
         else
         {
             //跳出循环，跳转到end_loop
-            v_Param = CmdUint.GetCmdParam();
-            if(v_Param.size() >= 2)
+            p_vParam = CmdUint.GetCmdParam();
+            if(p_vParam->size() >= 2)
             {
                 result.bIsJump = true;
-                result.nJumpLinePos = v_Param[0].nParam;
+                result.nJumpLinePos = p_vParam->at(0).nParam;
                 //循环类的·需要+1，因为end_loop会跳转回来
-                result.nJumpCmdPos = v_Param[1].nParam + 1;
+                result.nJumpCmdPos = p_vParam->at(1).nParam + 1;
                 result.bIsNextCmd = true;
             }
             else
@@ -120,12 +120,12 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
         break;
     case LogicalStatementType_END_LOOP:
         //跳回LOOP处
-        v_Param = CmdUint.GetCmdParam();
-        if(v_Param.size() >= 2)
+        p_vParam = CmdUint.GetCmdParam();
+        if(p_vParam->size() >= 2)
         {
             result.bIsJump = true;
-            result.nJumpLinePos = v_Param[0].nParam;
-            result.nJumpCmdPos = v_Param[1].nParam;
+            result.nJumpLinePos = p_vParam->at(0).nParam;
+            result.nJumpCmdPos = p_vParam->at(1).nParam;
             result.bIsNextCmd = true;
         }
         else
@@ -155,12 +155,12 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
         else
         {
             //条件不成立，跳转到end_while
-            v_Param = CmdUint.GetCmdParam();
-            if(v_Param.size() >= 2)
+            p_vParam = CmdUint.GetCmdParam();
+            if(p_vParam->size() >= 2)
             {
                 result.bIsJump = true;
-                result.nJumpLinePos = v_Param[0].nParam;
-                result.nJumpCmdPos = v_Param[1].nParam + 1;
+                result.nJumpLinePos = p_vParam->at(0).nParam;
+                result.nJumpCmdPos = p_vParam->at(1).nParam + 1;
                 result.bIsNextCmd = true;
                 result.bResetCmd = true;
             }
@@ -174,12 +174,12 @@ ST_Result Actuator::ExecuteLogicalStatement(CmdUint CmdUint)
         break;
     case LogicalStatementType_END_WHILE:
         //跳回LOOP处
-        v_Param = CmdUint.GetCmdParam();
-        if(v_Param.size() >= 2)
+        p_vParam = CmdUint.GetCmdParam();
+        if(p_vParam->size() >= 2)
         {
             result.bIsJump = true;
-            result.nJumpLinePos = v_Param[0].nParam;
-            result.nJumpCmdPos = v_Param[1].nParam;
+            result.nJumpLinePos = p_vParam->at(0).nParam;
+            result.nJumpCmdPos = p_vParam->at(1).nParam;
             result.bIsNextCmd = true;
         }
         else

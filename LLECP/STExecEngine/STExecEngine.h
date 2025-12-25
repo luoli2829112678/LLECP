@@ -1,4 +1,7 @@
 #include"VariableUint/StructManager.h"
+#include <ctime>
+#include <iomanip>
+#include <iostream>
 #include"CompilerCore/Parser.h"
 #include"CompilerCore/Actuator.h"
 #include"CompilerCore/VariableManager.h"

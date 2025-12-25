@@ -1,5 +1,6 @@
 file(GLOB_RECURSE CompilerCore_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CompilerCore/*.cpp")
-file(GLOB_RECURSE FunctionUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/FunctionUint/*.cpp")
+file(GLOB_RECURSE Function_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Function/*.cpp")
+file(GLOB_RECURSE FunctionUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Function/FunctionUint/*.cpp")
 file(GLOB_RECURSE VariableUint_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/VariableUint/*.cpp")
 file(GLOB_RECURSE CodeComponent_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CodeComponent/*.cpp")
 
@@ -8,6 +9,7 @@ file(GLOB_RECURSE CodeComponent_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CodeCompone
 add_library(STExecEngine SHARED
     STExecEngine.cpp
     ${CompilerCore_SOURCES}
+    ${Function_SOURCES}
     ${FunctionUint_SOURCES}
     ${VariableUint_SOURCES}
     ${CodeComponent_SOURCES}
@@ -15,7 +17,7 @@ add_library(STExecEngine SHARED
 
 
 file(GLOB FUNCTION_HEADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/FunctionUint/Function_*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Function/FunctionUint/Function_*.h"
 )
 set(FUNCTION_INCLUDE_CONTENT "#pragma once\n\n")
 set(FUNCTION_h1 "#include \"FunctionInfo.h\"\n\n")
@@ -23,11 +25,11 @@ set(FUNCTION_h2 "//#################该文件自动生成################\n\n")
 foreach(h ${FUNCTION_HEADERS})
     # h 是完整路径，取文件名
     get_filename_component(hname "${h}" NAME)
-    string(APPEND FUNCTION_INCLUDE_CONTENT "#include \"${hname}\"\n")
+    string(APPEND FUNCTION_INCLUDE_CONTENT "#include \"FunctionUint/${hname}\"\n")
 endforeach()
 
 file(WRITE
-    "${CMAKE_CURRENT_SOURCE_DIR}/FunctionUint/FunctionInclude.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Function/FunctionInclude.h"
     "${FUNCTION_INCLUDE_CONTENT}"
     "${FUNCTION_h1}"
     "${FUNCTION_h2}"

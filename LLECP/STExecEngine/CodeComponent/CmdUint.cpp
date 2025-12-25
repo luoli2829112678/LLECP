@@ -25,18 +25,18 @@ int CmdUint::SetCmdState(std::vector<UN_TransitionParam>v_State)
     m_vState  = v_State;
     return 0;
 }
-std::vector<UN_TransitionParam> CmdUint::GetCmdState()
+std::vector<UN_TransitionParam>* CmdUint::GetCmdState()
 {
-    return m_vState;
+    return &m_vState;
 }
 int CmdUint::SetCmdParam(std::vector<UN_TransitionParam>v_Param)
 {
     m_vParam = v_Param;
     return 0;
 }
-std::vector<UN_TransitionParam> CmdUint::GetCmdParam()
+std::vector<UN_TransitionParam>* CmdUint::GetCmdParam()
 {
-    return m_vParam;
+    return &m_vParam;
 }
 
 int CmdUint::InitCmd()
@@ -106,16 +106,26 @@ int CmdUint::InitCmdType()
                     m_enCmdType = CmdType_ENDLOOP;
                     break;
                 default:
+                    printf("Error: CmdUint::InitCmdType failed to init cmd type!\n");
+                    return -1;
                     break;
             }
+            return 0;
         }
         else if(m_vToken[i].enTokenType == TokenType_Assignment)
         {
             m_enCmdType = CmdType_Assignment;
+            return 0;
         }
         else if(m_vToken[i].enTokenType == TokenType_VariableType)
         {
             m_enCmdType = CmdType_VariableDeclaration;
+            return 0;
+        }
+        else if(m_vToken[i].enTokenType == TokenType_Function)
+        {
+            m_enCmdType = CmdType_Function;
+            return 0;
         }
     }
     if(m_enCmdType == CmdType_NULL)

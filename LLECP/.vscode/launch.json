@@ -89,11 +89,15 @@
             ]
         },
         {
-            "name": "调试 STExecEngineExamples",
+            "name": "调试 STExecEngineExamples (CPU2)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/usr/bin/LLETC/STExecEngineExamples",  // ✅ 你构建出来的目标路径
-            "args": [],
+            "program": "/usr/bin/taskset",
+            "args": [
+                "-c",
+                "2",
+                "/usr/bin/LLETC/STExecEngineExamples"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

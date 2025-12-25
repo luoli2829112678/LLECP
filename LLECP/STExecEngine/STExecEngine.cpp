@@ -15,6 +15,35 @@ STExecEngine::~STExecEngine()
 }
 
 
+void PrintNowUs()
+{
+    using namespace std::chrono;
+
+    // 当前系统时间
+    auto now = system_clock::now();
+
+    // 秒级时间点
+    auto sec = time_point_cast<seconds>(now);
+
+    // 微秒部分
+    auto us = duration_cast<microseconds>(now - sec).count();
+
+    // 转为本地时间
+    std::time_t tt = system_clock::to_time_t(sec);
+    std::tm tm{};
+    localtime_r(&tt, &tm);   // Linux 推荐，线程安全
+    // Windows 用 localtime_s(&tm, &tt);
+
+    printf("%04d-%02d-%02d %02d:%02d:%02d.%06ld\n",
+        tm.tm_year + 1900,
+        tm.tm_mon + 1,
+        tm.tm_mday,
+        tm.tm_hour,
+        tm.tm_min,
+        tm.tm_sec,
+        us);
+}
+
 int STExecEngine::STEE_EnableBuffer(uint16_t nBufferID,bool bEnable)
 {
     if(nBufferID>63)
@@ -56,6 +85,7 @@ int STExecEngine::InitProgramManager()
 
 int STExecEngine::ExecuteProgram()
 {
+    
     for (size_t i = 0; i <= m_ProgramManager.m_PushBufferID; i++)
     {
         if(m_ProgramManager.m_BufferUint[i].m_bBuffEnable && !m_ProgramManager.m_BufferUint[i].m_bBufferRunDone)
@@ -64,28 +94,32 @@ int STExecEngine::ExecuteProgram()
             uint32_t* pRunCmd = &m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].nCmdRunIndex;
             for (;*pRunCmd < m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd.size();)
             {
+                // auto start = std::chrono::steady_clock::now();
                 CmdUint RunCmd = m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].m_vCmd[*pRunCmd];
                 m_pActuator->ExecuteCommand(RunCmd);
+                // auto end = std::chrono::steady_clock::now();
+                // auto us = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+                // printf("Buffer %zu Line %u Cmd %u 执行时间1: %ld us\n", i, *pRunLine, *pRunCmd, us);
                 ST_Result CmdResult = RunCmd.GetResult();
                 //if执行完成后面的else/elseif跳转 该if 的if elseif else 状态全部为1
                 if((!CmdResult.bIsJump)&&(RunCmd.GetCmdType() == CmdType_IF || RunCmd.GetCmdType() == CmdType_ELSEIF))
                 {
-                    std::vector<UN_TransitionParam> vCmdParam = RunCmd.GetCmdParam();
-                    while(vCmdParam.size()>=2)
+                    std::vector<UN_TransitionParam>* pvCmdParam = RunCmd.GetCmdParam();
+                    while(pvCmdParam->size()>=2)
                     {
-                        int nJumpLine = vCmdParam[0].nParam;;
-                        int nJumpCmd  = vCmdParam[1].nParam;
+                        int nJumpLine = pvCmdParam->at(0).nParam;
+                        int nJumpCmd  = pvCmdParam->at(1).nParam;
                         UN_TransitionParam CmdParam;
                         CmdParam.nParam = 1;
-                        vector<UN_TransitionParam>vTCmdParam = m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].GetCmdState();
-                        if(vTCmdParam.size() > 0)//end_if不需要
+                        vector<UN_TransitionParam>*p_vTCmdParam = m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].GetCmdState();
+                        if(p_vTCmdParam->size() > 0)//end_if不需要
                         {
-                            vTCmdParam[0] = CmdParam;
-                            m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].SetCmdState(vTCmdParam);
+                            p_vTCmdParam->at(0) = CmdParam;
+                            m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].SetCmdState(*p_vTCmdParam);
                             
                         }
                         //拿出下一个节点
-                        vCmdParam = m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].GetCmdParam();
+                        pvCmdParam = m_ProgramManager.m_BufferUint[i].m_vLineList[nJumpLine].m_vCmd[nJumpCmd].GetCmdParam();
                     }
                 }
                 if(CmdResult.bIsJump)
@@ -94,7 +128,6 @@ int STExecEngine::ExecuteProgram()
                     m_ProgramManager.m_BufferUint[i].m_vLineList[CmdResult.nJumpLinePos].nCmdRunIndex = CmdResult.nJumpCmdPos;
                     continue;
                 }
-                
                 //BUFFER 跳出
                 if(!CmdResult.bIsNextCmd)
                 {
@@ -122,6 +155,7 @@ int STExecEngine::ExecuteProgram()
                                     //所有buffer执行完成
                                     m_ProgramManager.m_bProgramRunDone = true;
                                     printf("ExecuteProgram:All Program Execute Done!\n");
+                                    break;
                                 }
                             }
                             break;
@@ -129,15 +163,17 @@ int STExecEngine::ExecuteProgram()
                         //行结束
                         m_ProgramManager.m_BufferUint[i].m_nLineRunIndex++;
                         m_ProgramManager.m_BufferUint[i].m_vLineList[m_ProgramManager.m_BufferUint[i].m_nLineRunIndex].nCmdRunIndex = 0;
+                        return 0;
                     }
                     else
                     {
                         m_ProgramManager.m_BufferUint[i].m_vLineList[*pRunLine].nCmdRunIndex++;
                     }
                 }
-
             }
+
         }
     }
+
     return 0;
 }

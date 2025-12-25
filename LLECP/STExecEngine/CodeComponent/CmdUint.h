@@ -32,9 +32,9 @@ public:
     int SetCmdUint(std::vector<BaseToken> vToken);
     std::vector<BaseToken>* GetToken();
     int SetCmdState(std::vector<UN_TransitionParam>v_State);
-    std::vector<UN_TransitionParam> GetCmdState();
+    std::vector<UN_TransitionParam>* GetCmdState();
     int SetCmdParam(std::vector<UN_TransitionParam>v_Param);
-    std::vector<UN_TransitionParam> GetCmdParam();
+    std::vector<UN_TransitionParam>* GetCmdParam();
 
     int InitCmd();
     int InitCmdType();

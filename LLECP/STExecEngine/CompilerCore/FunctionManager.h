@@ -1,15 +1,16 @@
 #pragma once
 #include<string>
-#include"../FunctionUint/FunctionInclude.h"
+#include <memory>
+#include"../Function/FunctionInclude.h"
 using namespace std;
 class FunctionManager
 {
 private:
-    vector<FunctionInfo>m_vFunctionInfo;
+    std::vector<std::unique_ptr<FunctionInfo>> m_vFunctionInfo;
 public:
-    int GetFunctionAddr(string sCmd);
-    int AddFunctionInfo(FunctionInfo functionInfo);
-    FunctionInfo GetFunction(int nAddr);
+    int GetFunctionAddr(const std::string& sCmd);
+    int AddFunctionInfo(std::unique_ptr<FunctionInfo> functionInfo);
+    FunctionInfo* GetFunction(int nAddr);
     FunctionManager(/* args */);
     ~FunctionManager();
 };
